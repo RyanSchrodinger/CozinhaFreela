@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CozinhaFreela.Domain\CozinhaFreela.Domain.csproj" />
+    <ProjectReference Include="..\CozinhaFreela.Infrastructure\CozinhaFreela.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
