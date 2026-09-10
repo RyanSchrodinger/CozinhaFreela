@@ -1,1 +1,5 @@
-<Solution />
+<Solution>
+  <Project Path="CozinhaFreela.Domain/CozinhaFreela.Domain.csproj" />
+  <Project Path="CozinhaFreela.Infrastructure/CozinhaFreela.Infrastructure.csproj" />
+  <Project Path="CozinhaFreela.Web/CozinhaFreela.Web.csproj" />
+</Solution>
