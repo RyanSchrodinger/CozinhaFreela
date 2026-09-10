@@ -52,7 +52,6 @@ namespace CozinhaFreela.Domain.Usuarios
         [MaxLength(30)]
         public string EstadoCivil { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(80)]
         public string Funcao { get; set; } = string.Empty;
 

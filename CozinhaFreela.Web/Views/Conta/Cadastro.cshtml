@@ -1,0 +1,441 @@
+﻿@model CozinhaFreela.Web.ViewModels.Conta.CadastroViewModel
+
+@{
+    ViewData["Title"] = "Criar conta";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="text-center mb-4">
+                <h1 class="h2">Cadastro de funcionário</h1>
+
+                <p class="text-muted">
+                    Preencha seus dados para solicitar acesso
+                    ao CozinhaFreela.
+                </p>
+            </div>
+
+            <form asp-controller="Conta"
+                  asp-action="Cadastro"
+                  method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h5 mb-4">
+                            Dados pessoais
+                        </h2>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="NomeCompleto"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="NomeCompleto"
+                                       class="form-control"
+                                       autocomplete="name" />
+
+                                <span asp-validation-for="NomeCompleto"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Cpf"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Cpf"
+                                       class="form-control"
+                                       inputmode="numeric"
+                                       autocomplete="off" />
+
+                                <span asp-validation-for="Cpf"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DataNascimento"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="DataNascimento"
+                                       class="form-control"
+                                       type="date" />
+
+                                <span asp-validation-for="DataNascimento"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Telefone"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Telefone"
+                                       class="form-control"
+                                       inputmode="tel"
+                                       autocomplete="tel" />
+
+                                <span asp-validation-for="Telefone"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Nacionalidade"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Nacionalidade"
+                                       class="form-control"
+                                       value="Brasileira" />
+
+                                <span asp-validation-for="Nacionalidade"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="EstadoCivil"
+                                       class="form-label">
+                                </label>
+
+                                <select asp-for="EstadoCivil"
+                                        class="form-select">
+
+                                    <option value="">
+                                        Selecione
+                                    </option>
+
+                                    <option>Solteiro(a)</option>
+                                    <option>Casado(a)</option>
+                                    <option>Divorciado(a)</option>
+                                    <option>Viúvo(a)</option>
+                                    <option>União estável</option>
+                                </select>
+
+                                <span asp-validation-for="EstadoCivil"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h5 mb-4">
+                            Endereço
+                        </h2>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="Cep"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Cep"
+                                       class="form-control"
+                                       inputmode="numeric"
+                                       autocomplete="postal-code" />
+
+                                <span asp-validation-for="Cep"
+                                      class="text-danger">
+                                </span>
+
+                                <div id="mensagemCep"
+                                     class="form-text">
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label asp-for="Rua"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Rua"
+                                       class="form-control"
+                                       autocomplete="address-line1" />
+
+                                <span asp-validation-for="Rua"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Numero"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Numero"
+                                       class="form-control"
+                                       autocomplete="address-line2" />
+
+                                <span asp-validation-for="Numero"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label asp-for="Complemento"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Complemento"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Complemento"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label asp-for="Bairro"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Bairro"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Bairro"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label asp-for="Cidade"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Cidade"
+                                       class="form-control"
+                                       autocomplete="address-level2" />
+
+                                <span asp-validation-for="Cidade"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label asp-for="Estado"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Estado"
+                                       class="form-control text-uppercase"
+                                       maxlength="2"
+                                       autocomplete="address-level1" />
+
+                                <span asp-validation-for="Estado"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h5 mb-4">
+                            Contato de emergência
+                        </h2>
+
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label asp-for="ContatoEmergenciaNome"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ContatoEmergenciaNome"
+                                       class="form-control" />
+
+                                <span asp-validation-for="ContatoEmergenciaNome"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label asp-for="ContatoEmergenciaTelefone"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ContatoEmergenciaTelefone"
+                                       class="form-control"
+                                       inputmode="tel" />
+
+                                <span asp-validation-for="ContatoEmergenciaTelefone"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Observacoes"
+                                       class="form-label">
+                                </label>
+
+                                <textarea asp-for="Observacoes"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Informações adicionais relevantes">
+                                </textarea>
+
+                                <span asp-validation-for="Observacoes"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h5 mb-4">
+                            Dados de acesso
+                        </h2>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="Email"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Email"
+                                       class="form-control"
+                                       autocomplete="email" />
+
+                                <span asp-validation-for="Email"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Senha"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Senha"
+                                       class="form-control"
+                                       autocomplete="new-password" />
+
+                                <span asp-validation-for="Senha"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmacaoSenha"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ConfirmacaoSenha"
+                                       class="form-control"
+                                       autocomplete="new-password" />
+
+                                <span asp-validation-for="ConfirmacaoSenha"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit"
+                            class="btn btn-primary btn-lg">
+                        Enviar cadastro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const campoCep =
+                document.getElementById("Cep");
+
+            const campoRua =
+                document.getElementById("Rua");
+
+            const campoBairro =
+                document.getElementById("Bairro");
+
+            const campoCidade =
+                document.getElementById("Cidade");
+
+            const campoEstado =
+                document.getElementById("Estado");
+
+            const mensagemCep =
+                document.getElementById("mensagemCep");
+
+            campoCep?.addEventListener("blur", async () => {
+                const cep =
+                    campoCep.value.replace(/\D/g, "");
+
+                if (cep.length !== 8) {
+                    mensagemCep.textContent =
+                        "Informe um CEP com 8 números.";
+
+                    return;
+                }
+
+                mensagemCep.textContent =
+                    "Buscando endereço...";
+
+                try {
+                    const resposta =
+                        await fetch(
+                            `https://viacep.com.br/ws/${cep}/json/`
+                        );
+
+                    if (!resposta.ok) {
+                        throw new Error();
+                    }
+
+                    const endereco =
+                        await resposta.json();
+
+                    if (endereco.erro) {
+                        mensagemCep.textContent =
+                            "CEP não encontrado.";
+
+                        return;
+                    }
+
+                    campoRua.value =
+                        endereco.logradouro ?? "";
+
+                    campoBairro.value =
+                        endereco.bairro ?? "";
+
+                    campoCidade.value =
+                        endereco.localidade ?? "";
+
+                    campoEstado.value =
+                        endereco.uf ?? "";
+
+                    mensagemCep.textContent =
+                        "Endereço encontrado.";
+                } catch {
+                    mensagemCep.textContent =
+                        "Não foi possível consultar o CEP.";
+                }
+            });
+        });
+    </script>
+}
