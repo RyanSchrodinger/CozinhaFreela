@@ -4,6 +4,9 @@ using CozinhaFreela.Infrastructure.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+//pedir para o chat me passar todas regras importantes que envolve segurança 
+// tipo essa (mesmo digitando a URL diretamente, um funcionário comum não poderá acessar.)
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
