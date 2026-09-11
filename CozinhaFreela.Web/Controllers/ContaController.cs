@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using CozinhaFreela.Domain.Usuarios;
 using CozinhaFreela.Infrastructure.Data;
+using CozinhaFreela.Infrastructure.Email;
 using CozinhaFreela.Web.ViewModels.Conta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,12 +15,23 @@ namespace CozinhaFreela.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
+        private readonly ICodigoConfirmacaoEmailService
+            _codigoConfirmacaoEmailService;
+
+        private readonly ILogger<ContaController> _logger;
+
         public ContaController(
             UserManager<ApplicationUser> userManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ICodigoConfirmacaoEmailService
+                codigoConfirmacaoEmailService,
+            ILogger<ContaController> logger)
         {
             _userManager = userManager;
             _context = context;
+            _codigoConfirmacaoEmailService =
+                codigoConfirmacaoEmailService;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -48,8 +60,11 @@ namespace CozinhaFreela.Web.Controllers
             model.Cpf = SomenteNumeros(model.Cpf);
             model.Cep = SomenteNumeros(model.Cep);
             model.Telefone = SomenteNumeros(model.Telefone);
+
             model.ContatoEmergenciaTelefone =
-                SomenteNumeros(model.ContatoEmergenciaTelefone);
+                SomenteNumeros(
+                    model.ContatoEmergenciaTelefone
+                );
 
             if (model.Cpf.Length != 11)
             {
@@ -64,6 +79,18 @@ namespace CozinhaFreela.Web.Controllers
                 ModelState.AddModelError(
                     nameof(model.Cep),
                     "O CEP deve possuir 8 números."
+                );
+            }
+
+            var hoje =
+                DateOnly.FromDateTime(DateTime.Today);
+
+            if (model.DataNascimento == default ||
+                model.DataNascimento >= hoje)
+            {
+                ModelState.AddModelError(
+                    nameof(model.DataNascimento),
+                    "Informe uma data de nascimento válida."
                 );
             }
 
@@ -89,13 +116,15 @@ namespace CozinhaFreela.Web.Controllers
             }
 
             await using var transacao =
-                await _context.Database.BeginTransactionAsync();
+                await _context.Database
+                    .BeginTransactionAsync();
 
             var usuario = new ApplicationUser
             {
                 NomeCompleto = model.NomeCompleto.Trim(),
                 UserName = model.Email.Trim(),
                 Email = model.Email.Trim(),
+                EmailConfirmed = false,
                 StatusCadastro = StatusCadastro.Pendente,
                 Ativo = false
             };
@@ -108,13 +137,7 @@ namespace CozinhaFreela.Web.Controllers
 
             if (!resultadoUsuario.Succeeded)
             {
-                foreach (var erro in resultadoUsuario.Errors)
-                {
-                    ModelState.AddModelError(
-                        string.Empty,
-                        erro.Description
-                    );
-                }
+                AdicionarErros(resultadoUsuario);
 
                 return View(model);
             }
@@ -128,20 +151,29 @@ namespace CozinhaFreela.Web.Controllers
                 Cep = model.Cep,
                 Rua = model.Rua.Trim(),
                 Numero = model.Numero.Trim(),
-                Complemento = model.Complemento?.Trim(),
+                Complemento =
+                    model.Complemento?.Trim(),
                 Bairro = model.Bairro.Trim(),
                 Cidade = model.Cidade.Trim(),
-                Estado = model.Estado.Trim().ToUpperInvariant(),
-                Nacionalidade = model.Nacionalidade.Trim(),
-                EstadoCivil = model.EstadoCivil.Trim(),
+                Estado =
+                    model.Estado
+                        .Trim()
+                        .ToUpperInvariant(),
+                Nacionalidade =
+                    model.Nacionalidade.Trim(),
+                EstadoCivil =
+                    model.EstadoCivil.Trim(),
+                Funcao = null,
                 ContatoEmergenciaNome =
                     model.ContatoEmergenciaNome.Trim(),
                 ContatoEmergenciaTelefone =
                     model.ContatoEmergenciaTelefone,
-                Observacoes = model.Observacoes?.Trim()
+                Observacoes =
+                    model.Observacoes?.Trim()
             };
 
             _context.Funcionarios.Add(funcionario);
+
             await _context.SaveChangesAsync();
 
             var resultadoRole =
@@ -152,12 +184,35 @@ namespace CozinhaFreela.Web.Controllers
 
             if (!resultadoRole.Succeeded)
             {
-                throw new InvalidOperationException(
-                    "Não foi possível definir o perfil do funcionário."
-                );
+                AdicionarErros(resultadoRole);
+
+                return View(model);
             }
 
             await transacao.CommitAsync();
+
+            try
+            {
+                await _codigoConfirmacaoEmailService
+                    .GerarEEnviarAsync(usuario);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(
+                    exception,
+                    "Não foi possível enviar o código de confirmação para o usuário {UsuarioId}.",
+                    usuario.Id
+                );
+
+                TempData["AvisoEnvioEmail"] =
+                    "O cadastro foi salvo, mas não foi possível enviar o código. Você poderá solicitar um novo código.";
+
+                return RedirectToAction(
+                    nameof(ConfirmacaoPendente)
+                );
+            }
+
+            TempData["EmailCadastro"] = usuario.Email;
 
             return RedirectToAction(
                 nameof(ConfirmacaoPendente)
@@ -169,6 +224,18 @@ namespace CozinhaFreela.Web.Controllers
         public IActionResult ConfirmacaoPendente()
         {
             return View();
+        }
+
+        private void AdicionarErros(
+            IdentityResult resultado)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    erro.Description
+                );
+            }
         }
 
         private static string SomenteNumeros(

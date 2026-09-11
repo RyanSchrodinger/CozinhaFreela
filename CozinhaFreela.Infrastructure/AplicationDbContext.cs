@@ -15,6 +15,10 @@ namespace CozinhaFreela.Infrastructure.Data
 
         public DbSet<Funcionario> Funcionarios =>
             Set<Funcionario>();
+       
+        public DbSet<CodigoConfirmacaoEmail>
+            CodigosConfirmacaoEmail =>
+                Set<CodigoConfirmacaoEmail>();
 
         protected override void OnModelCreating(
             ModelBuilder builder)
@@ -73,6 +77,31 @@ namespace CozinhaFreela.Infrastructure.Data
                         .HasMaxLength(2)
                         .IsRequired();
                 });
+
+            builder.Entity<CodigoConfirmacaoEmail>(
+                entity =>
+                {
+                    entity.HasKey(codigo => codigo.Id);
+
+                    entity.Property(codigo => codigo.CodigoHash)
+                        .HasMaxLength(500)
+                        .IsRequired();
+
+                    entity.HasIndex(codigo => new
+                    {
+                        codigo.UsuarioId,
+                        codigo.DataExpiracao
+                    });
+
+                    entity.HasOne(codigo => codigo.Usuario)
+                        .WithMany()
+                        .HasForeignKey(codigo => codigo.UsuarioId)
+                        .OnDelete(DeleteBehavior.Cascade);
+                }
+            );
+
+
+
         }
     }
 }

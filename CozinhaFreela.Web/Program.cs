@@ -1,5 +1,6 @@
 using CozinhaFreela.Domain.Usuarios;
 using CozinhaFreela.Infrastructure.Data;
+using CozinhaFreela.Infrastructure.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,6 +57,17 @@ builder.Services.ConfigureApplicationCookie(
         options.SlidingExpiration = true;
     }
 );
+
+builder.Services.Configure<ConfiguracaoEmail>(
+    builder.Configuration.GetSection("Email")
+);
+
+builder.Services.AddTransient<
+    IEmailService,
+    SmtpEmailService>();
+builder.Services.AddScoped<
+    ICodigoConfirmacaoEmailService,
+    CodigoConfirmacaoEmailService>();
 
 var app = builder.Build();
 
