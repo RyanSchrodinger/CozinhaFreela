@@ -1,0 +1,178 @@
+﻿@model CozinhaFreela.Web.ViewModels.Conta.LoginViewModel
+
+@{
+    ViewData["Title"] = "Área do funcionário";
+}
+
+<section class="pagina-login">
+    <div class="container">
+        <div class="login-card">
+            <div class="login-imagem">
+                <div class="login-imagem-sobreposicao"></div>
+
+                <div class="login-apresentacao">
+                    <span class="login-etiqueta">
+                        Área interna
+                    </span>
+
+                    <h1>
+                        Organização que facilita
+                        <span>a rotina da equipe.</span>
+                    </h1>
+
+                    <p>
+                        Consulte suas escalas,
+                        disponibilidades e tarefas
+                        em um único lugar.
+                    </p>
+                </div>
+            </div>
+
+            <div class="login-formulario-area">
+                <div class="login-formulario-cabecalho">
+                    <span class="secao-etiqueta">
+                        Bem-vindo
+                    </span>
+
+                    <h2>Entre na sua conta</h2>
+
+                    <p>
+                        Utilize o e-mail e a senha
+                        informados no seu cadastro.
+                    </p>
+                </div>
+
+                <form asp-controller="Conta"
+                      asp-action="Login"
+                      method="post"
+                      class="login-formulario">
+                    <input asp-for="ReturnUrl"
+                           type="hidden" />
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alerta-validacao"></div>
+
+                    <div class="campo-login">
+                        <label asp-for="Email"></label>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="seuemail@exemplo.com"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="Email"
+                              class="mensagem-validacao"></span>
+                    </div>
+
+                    <div class="campo-login">
+                        <div class="campo-login-cabecalho">
+                            <label asp-for="Senha"></label>
+
+                            <a href="#"
+                               class="link-recuperar-senha"
+                               aria-disabled="true"
+                               title="A recuperação de senha será implementada futuramente">
+                                Esqueci minha senha
+                            </a>
+                        </div>
+
+                        <div class="campo-senha">
+                            <input asp-for="Senha"
+                                   class="form-control"
+                                   placeholder="Digite sua senha"
+                                   autocomplete="current-password" />
+
+                            <button id="botaoExibirSenha"
+                                    class="botao-exibir-senha"
+                                    type="button"
+                                    aria-label="Exibir senha"
+                                    aria-pressed="false">
+                                Exibir
+                            </button>
+                        </div>
+
+                        <span asp-validation-for="Senha"
+                              class="mensagem-validacao"></span>
+                    </div>
+
+                    <div class="opcoes-login">
+                        <label class="lembrar-me">
+                            <input asp-for="LembrarMe"
+                                   class="form-check-input" />
+
+                            <span>
+                                Manter conectado
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit"
+                            class="botao botao-verde botao-login">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="login-cadastro">
+                    <span>Ainda não possui uma conta?</span>
+
+                    <a asp-controller="Conta"
+                       asp-action="Cadastro">
+                        Fazer cadastro
+                    </a>
+                </div>
+
+                <a class="voltar-site"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <span aria-hidden="true">←</span>
+                    Voltar para o site
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const campoSenha =
+            document.getElementById("Senha");
+
+        const botaoExibirSenha =
+            document.getElementById(
+                "botaoExibirSenha"
+            );
+
+        botaoExibirSenha?.addEventListener(
+            "click",
+            () => {
+                const senhaEstaVisivel =
+                    campoSenha.type === "text";
+
+                campoSenha.type =
+                    senhaEstaVisivel
+                        ? "password"
+                        : "text";
+
+                botaoExibirSenha.textContent =
+                    senhaEstaVisivel
+                        ? "Exibir"
+                        : "Ocultar";
+
+                botaoExibirSenha.setAttribute(
+                    "aria-label",
+                    senhaEstaVisivel
+                        ? "Exibir senha"
+                        : "Ocultar senha"
+                );
+
+                botaoExibirSenha.setAttribute(
+                    "aria-pressed",
+                    (!senhaEstaVisivel).toString()
+                );
+            }
+        );
+    </script>
+}

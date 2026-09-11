@@ -279,11 +279,13 @@
 
             <div class="area-funcionario-acoes">
                 <a class="botao botao-claro"
-                   href="#"
-                   aria-disabled="true"
-                   title="O login será implementado em breve">
-                    Entrar
-                </a>
+                    <a
+                        class="botao botao-claro"
+                        asp-controller="Conta"
+                        asp-action="Login"
+                        >
+                            Entrar
+                        </a>
 
                 <a class="botao botao-contorno-claro"
                    asp-controller="Conta"

@@ -12,27 +12,42 @@ namespace CozinhaFreela.Web.Controllers
 {
     public class ContaController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser>
+            _userManager;
+
+        private readonly SignInManager<ApplicationUser>
+            _signInManager;
+
+        private readonly ApplicationDbContext
+            _context;
 
         private readonly ICodigoConfirmacaoEmailService
             _codigoConfirmacaoEmailService;
 
-        private readonly ILogger<ContaController> _logger;
+        private readonly ILogger<ContaController>
+            _logger;
 
         public ContaController(
             UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext context,
             ICodigoConfirmacaoEmailService
                 codigoConfirmacaoEmailService,
             ILogger<ContaController> logger)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _context = context;
+
             _codigoConfirmacaoEmailService =
                 codigoConfirmacaoEmailService;
+
             _logger = logger;
         }
+
+        /*
+            CADASTRO
+        */
 
         [AllowAnonymous]
         [HttpGet]
@@ -40,7 +55,10 @@ namespace CozinhaFreela.Web.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
             return View();
@@ -54,12 +72,20 @@ namespace CozinhaFreela.Web.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
-            model.Cpf = SomenteNumeros(model.Cpf);
-            model.Cep = SomenteNumeros(model.Cep);
-            model.Telefone = SomenteNumeros(model.Telefone);
+            model.Cpf =
+                SomenteNumeros(model.Cpf);
+
+            model.Cep =
+                SomenteNumeros(model.Cep);
+
+            model.Telefone =
+                SomenteNumeros(model.Telefone);
 
             model.ContatoEmergenciaTelefone =
                 SomenteNumeros(
@@ -83,7 +109,9 @@ namespace CozinhaFreela.Web.Controllers
             }
 
             var hoje =
-                DateOnly.FromDateTime(DateTime.Today);
+                DateOnly.FromDateTime(
+                    DateTime.Today
+                );
 
             if (model.DataNascimento == default ||
                 model.DataNascimento >= hoje)
@@ -121,11 +149,20 @@ namespace CozinhaFreela.Web.Controllers
 
             var usuario = new ApplicationUser
             {
-                NomeCompleto = model.NomeCompleto.Trim(),
-                UserName = model.Email.Trim(),
-                Email = model.Email.Trim(),
+                NomeCompleto =
+                    model.NomeCompleto.Trim(),
+
+                UserName =
+                    model.Email.Trim(),
+
+                Email =
+                    model.Email.Trim(),
+
                 EmailConfirmed = false,
-                StatusCadastro = StatusCadastro.Pendente,
+
+                StatusCadastro =
+                    StatusCadastro.Pendente,
+
                 Ativo = false
             };
 
@@ -137,7 +174,9 @@ namespace CozinhaFreela.Web.Controllers
 
             if (!resultadoUsuario.Succeeded)
             {
-                AdicionarErros(resultadoUsuario);
+                AdicionarErros(
+                    resultadoUsuario
+                );
 
                 return View(model);
             }
@@ -146,33 +185,54 @@ namespace CozinhaFreela.Web.Controllers
             {
                 UsuarioId = usuario.Id,
                 Cpf = model.Cpf,
-                DataNascimento = model.DataNascimento,
+
+                DataNascimento =
+                    model.DataNascimento,
+
                 Telefone = model.Telefone,
                 Cep = model.Cep,
-                Rua = model.Rua.Trim(),
-                Numero = model.Numero.Trim(),
+
+                Rua =
+                    model.Rua.Trim(),
+
+                Numero =
+                    model.Numero.Trim(),
+
                 Complemento =
                     model.Complemento?.Trim(),
-                Bairro = model.Bairro.Trim(),
-                Cidade = model.Cidade.Trim(),
+
+                Bairro =
+                    model.Bairro.Trim(),
+
+                Cidade =
+                    model.Cidade.Trim(),
+
                 Estado =
                     model.Estado
                         .Trim()
                         .ToUpperInvariant(),
+
                 Nacionalidade =
                     model.Nacionalidade.Trim(),
+
                 EstadoCivil =
                     model.EstadoCivil.Trim(),
+
                 Funcao = null,
+
                 ContatoEmergenciaNome =
                     model.ContatoEmergenciaNome.Trim(),
+
                 ContatoEmergenciaTelefone =
                     model.ContatoEmergenciaTelefone,
+
                 Observacoes =
                     model.Observacoes?.Trim()
             };
 
-            _context.Funcionarios.Add(funcionario);
+            _context.Funcionarios.Add(
+                funcionario
+            );
 
             await _context.SaveChangesAsync();
 
@@ -184,7 +244,9 @@ namespace CozinhaFreela.Web.Controllers
 
             if (!resultadoRole.Succeeded)
             {
-                AdicionarErros(resultadoRole);
+                AdicionarErros(
+                    resultadoRole
+                );
 
                 return View(model);
             }
@@ -221,22 +283,35 @@ namespace CozinhaFreela.Web.Controllers
             );
         }
 
+        /*
+            CONFIRMAÇÃO DO E-MAIL
+        */
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> ConfirmarEmail(
             string usuarioId)
         {
-            if (string.IsNullOrWhiteSpace(usuarioId))
+            if (string.IsNullOrWhiteSpace(
+                    usuarioId))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
             var usuario =
-                await _userManager.FindByIdAsync(usuarioId);
+                await _userManager.FindByIdAsync(
+                    usuarioId
+                );
 
             if (usuario is null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
             if (usuario.EmailConfirmed)
@@ -249,10 +324,11 @@ namespace CozinhaFreela.Web.Controllers
             ViewBag.EmailMascarado =
                 MascararEmail(usuario.Email);
 
-            var model = new ConfirmarEmailViewModel
-            {
-                UsuarioId = usuario.Id
-            };
+            var model =
+                new ConfirmarEmailViewModel
+                {
+                    UsuarioId = usuario.Id
+                };
 
             return View(model);
         }
@@ -263,9 +339,13 @@ namespace CozinhaFreela.Web.Controllers
         public async Task<IActionResult> ConfirmarEmail(
             ConfirmarEmailViewModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.UsuarioId))
+            if (string.IsNullOrWhiteSpace(
+                    model.UsuarioId))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
             var usuario =
@@ -275,7 +355,10 @@ namespace CozinhaFreela.Web.Controllers
 
             if (usuario is null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
             }
 
             if (usuario.EmailConfirmed)
@@ -304,17 +387,23 @@ namespace CozinhaFreela.Web.Controllers
             {
                 case ResultadoConfirmacaoEmail.Sucesso:
                     return RedirectToAction(
-                        nameof(ConfirmacaoConcluida)
+                        nameof(
+                            ConfirmacaoConcluida
+                        )
                     );
 
-                case ResultadoConfirmacaoEmail.CodigoInvalido:
+                case ResultadoConfirmacaoEmail
+                    .CodigoInvalido:
+
                     ModelState.AddModelError(
                         nameof(model.Codigo),
                         "O código informado está incorreto."
                     );
                     break;
 
-                case ResultadoConfirmacaoEmail.CodigoExpirado:
+                case ResultadoConfirmacaoEmail
+                    .CodigoExpirado:
+
                     ModelState.AddModelError(
                         nameof(model.Codigo),
                         "Este código expirou."
@@ -354,6 +443,198 @@ namespace CozinhaFreela.Web.Controllers
         {
             return View();
         }
+
+        /*
+            LOGIN
+        */
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Login(
+            string? returnUrl = null)
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
+            }
+
+            var model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(
+            LoginViewModel model)
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            model.Email =
+                model.Email.Trim();
+
+            var usuario =
+                await _userManager.FindByEmailAsync(
+                    model.Email
+                );
+
+            if (usuario is null)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "E-mail ou senha inválidos."
+                );
+
+                return View(model);
+            }
+
+            var resultado =
+                await _signInManager
+                    .PasswordSignInAsync(
+                        usuario,
+                        model.Senha,
+                        model.LembrarMe,
+                        lockoutOnFailure: true
+                    );
+
+            if (resultado.IsLockedOut)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "A conta foi temporariamente bloqueada devido a várias tentativas. Tente novamente em 15 minutos."
+                );
+
+                return View(model);
+            }
+
+            if (resultado.IsNotAllowed)
+            {
+                if (!usuario.EmailConfirmed)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Você precisa confirmar seu e-mail antes de entrar."
+                    );
+                }
+                else
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "O acesso desta conta ainda não está permitido."
+                    );
+                }
+
+                return View(model);
+            }
+
+            if (!resultado.Succeeded)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "E-mail ou senha inválidos."
+                );
+
+                return View(model);
+            }
+
+            if (usuario.StatusCadastro ==
+                StatusCadastro.Pendente)
+            {
+                await _signInManager.SignOutAsync();
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Seu e-mail foi confirmado, mas seu cadastro ainda está aguardando aprovação."
+                );
+
+                return View(model);
+            }
+
+            if (usuario.StatusCadastro ==
+                StatusCadastro.Recusado)
+            {
+                await _signInManager.SignOutAsync();
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Este cadastro não foi aprovado. Procure a responsável pela equipe."
+                );
+
+                return View(model);
+            }
+
+            if (!usuario.Ativo)
+            {
+                await _signInManager.SignOutAsync();
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Esta conta está desativada. Procure a responsável pela equipe."
+                );
+
+                return View(model);
+            }
+
+            if (!string.IsNullOrWhiteSpace(
+                    model.ReturnUrl) &&
+                Url.IsLocalUrl(model.ReturnUrl))
+            {
+                return LocalRedirect(
+                    model.ReturnUrl
+                );
+            }
+
+            return RedirectToAction(
+                "Index",
+                "Home"
+            );
+        }
+
+        /*
+            LOGOUT E ACESSO NEGADO
+        */
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            return RedirectToAction(
+                "Index",
+                "Home"
+            );
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult AcessoNegado()
+        {
+            return View();
+        }
+
+        /*
+            MÉTODOS AUXILIARES
+        */
 
         private void AdicionarErros(
             IdentityResult resultado)
