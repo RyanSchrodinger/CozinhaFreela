@@ -10,6 +10,9 @@ namespace CozinhaFreela.Infrastructure.Email
     public class CodigoConfirmacaoEmailService
         : ICodigoConfirmacaoEmailService
     {
+        private const int ValidadeEmMinutos = 10;
+        private const int LimiteTentativas = 5;
+
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
 
@@ -51,7 +54,9 @@ namespace CozinhaFreela.Infrastructure.Email
             {
                 UsuarioId = usuario.Id,
                 DataCriacao = DateTime.UtcNow,
-                DataExpiracao = DateTime.UtcNow.AddMinutes(10)
+                DataExpiracao = DateTime.UtcNow.AddMinutes(
+                    ValidadeEmMinutos
+                )
             };
 
             var hasher =
@@ -89,7 +94,8 @@ namespace CozinhaFreela.Infrastructure.Email
                     </div>
 
                     <p>
-                        O código é válido por 10 minutos.
+                        O código é válido por
+                        {ValidadeEmMinutos} minutos.
                     </p>
 
                     <p>
@@ -104,6 +110,75 @@ namespace CozinhaFreela.Infrastructure.Email
                 "Código de confirmação — CozinhaFreela",
                 conteudoHtml
             );
+        }
+
+        public async Task<ResultadoConfirmacaoEmail>
+            ConfirmarAsync(
+                string usuarioId,
+                string codigo)
+        {
+            var registro =
+                await _context.CodigosConfirmacaoEmail
+                    .Include(item => item.Usuario)
+                    .Where(item =>
+                        item.UsuarioId == usuarioId &&
+                        item.DataConfirmacao == null)
+                    .OrderByDescending(
+                        item => item.DataCriacao
+                    )
+                    .FirstOrDefaultAsync();
+
+            if (registro is null)
+            {
+                return ResultadoConfirmacaoEmail
+                    .CodigoNaoEncontrado;
+            }
+
+            if (registro.DataExpiracao <= DateTime.UtcNow)
+            {
+                return ResultadoConfirmacaoEmail
+                    .CodigoExpirado;
+            }
+
+            if (registro.Tentativas >= LimiteTentativas)
+            {
+                return ResultadoConfirmacaoEmail
+                    .LimiteTentativasExcedido;
+            }
+
+            registro.Tentativas++;
+
+            var hasher =
+                new PasswordHasher<CodigoConfirmacaoEmail>();
+
+            var verificacao =
+                hasher.VerifyHashedPassword(
+                    registro,
+                    registro.CodigoHash,
+                    codigo
+                );
+
+            if (verificacao ==
+                PasswordVerificationResult.Failed)
+            {
+                await _context.SaveChangesAsync();
+
+                if (registro.Tentativas >= LimiteTentativas)
+                {
+                    return ResultadoConfirmacaoEmail
+                        .LimiteTentativasExcedido;
+                }
+
+                return ResultadoConfirmacaoEmail
+                    .CodigoInvalido;
+            }
+
+            registro.DataConfirmacao = DateTime.UtcNow;
+            registro.Usuario.EmailConfirmed = true;
+
+            await _context.SaveChangesAsync();
+
+            return ResultadoConfirmacaoEmail.Sucesso;
         }
     }
 }

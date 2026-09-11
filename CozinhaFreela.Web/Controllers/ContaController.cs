@@ -212,11 +212,140 @@ namespace CozinhaFreela.Web.Controllers
                 );
             }
 
-            TempData["EmailCadastro"] = usuario.Email;
-
             return RedirectToAction(
-                nameof(ConfirmacaoPendente)
+                nameof(ConfirmarEmail),
+                new
+                {
+                    usuarioId = usuario.Id
+                }
             );
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ConfirmarEmail(
+            string usuarioId)
+        {
+            if (string.IsNullOrWhiteSpace(usuarioId))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var usuario =
+                await _userManager.FindByIdAsync(usuarioId);
+
+            if (usuario is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (usuario.EmailConfirmed)
+            {
+                return RedirectToAction(
+                    nameof(ConfirmacaoConcluida)
+                );
+            }
+
+            ViewBag.EmailMascarado =
+                MascararEmail(usuario.Email);
+
+            var model = new ConfirmarEmailViewModel
+            {
+                UsuarioId = usuario.Id
+            };
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmarEmail(
+            ConfirmarEmailViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.UsuarioId))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var usuario =
+                await _userManager.FindByIdAsync(
+                    model.UsuarioId
+                );
+
+            if (usuario is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (usuario.EmailConfirmed)
+            {
+                return RedirectToAction(
+                    nameof(ConfirmacaoConcluida)
+                );
+            }
+
+            ViewBag.EmailMascarado =
+                MascararEmail(usuario.Email);
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var resultado =
+                await _codigoConfirmacaoEmailService
+                    .ConfirmarAsync(
+                        model.UsuarioId,
+                        model.Codigo
+                    );
+
+            switch (resultado)
+            {
+                case ResultadoConfirmacaoEmail.Sucesso:
+                    return RedirectToAction(
+                        nameof(ConfirmacaoConcluida)
+                    );
+
+                case ResultadoConfirmacaoEmail.CodigoInvalido:
+                    ModelState.AddModelError(
+                        nameof(model.Codigo),
+                        "O código informado está incorreto."
+                    );
+                    break;
+
+                case ResultadoConfirmacaoEmail.CodigoExpirado:
+                    ModelState.AddModelError(
+                        nameof(model.Codigo),
+                        "Este código expirou."
+                    );
+                    break;
+
+                case ResultadoConfirmacaoEmail
+                    .LimiteTentativasExcedido:
+
+                    ModelState.AddModelError(
+                        nameof(model.Codigo),
+                        "O limite de tentativas foi atingido."
+                    );
+                    break;
+
+                default:
+                    ModelState.AddModelError(
+                        nameof(model.Codigo),
+                        "Não existe um código válido para esta conta."
+                    );
+                    break;
+            }
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ConfirmacaoConcluida()
+        {
+            return View();
         }
 
         [AllowAnonymous]
@@ -246,6 +375,32 @@ namespace CozinhaFreela.Web.Controllers
                 @"\D",
                 string.Empty
             );
+        }
+
+        private static string MascararEmail(
+            string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return string.Empty;
+            }
+
+            var partes = email.Split('@');
+
+            if (partes.Length != 2 ||
+                string.IsNullOrWhiteSpace(partes[0]))
+            {
+                return email;
+            }
+
+            var nome = partes[0];
+
+            var inicio =
+                nome.Length <= 2
+                    ? nome[..1]
+                    : nome[..2];
+
+            return $"{inicio}***@{partes[1]}";
         }
     }
 }

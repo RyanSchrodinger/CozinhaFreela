@@ -4,6 +4,11 @@ namespace CozinhaFreela.Infrastructure.Email
 {
     public interface ICodigoConfirmacaoEmailService
     {
-        Task GerarEEnviarAsync(ApplicationUser usuario);
+        Task GerarEEnviarAsync(
+            ApplicationUser usuario);
+
+        Task<ResultadoConfirmacaoEmail> ConfirmarAsync(
+            string usuarioId,
+            string codigo);
     }
 }

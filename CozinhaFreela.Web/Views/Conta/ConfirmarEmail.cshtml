@@ -1,0 +1,70 @@
+﻿@model CozinhaFreela.Web.ViewModels.Conta.ConfirmarEmailViewModel
+
+@{
+    ViewData["Title"] = "Confirmar e-mail";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h1 class="h3">
+                            Confirme seu e-mail
+                        </h1>
+
+                        <p class="text-muted">
+                            Enviamos um código de 6 números para
+                            <strong>@ViewBag.EmailMascarado</strong>.
+                        </p>
+                    </div>
+
+                    <form asp-controller="Conta"
+                          asp-action="ConfirmarEmail"
+                          method="post">
+
+                        <input asp-for="UsuarioId"
+                               type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Codigo"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Codigo"
+                                   class="form-control form-control-lg text-center"
+                                   inputmode="numeric"
+                                   maxlength="6"
+                                   autocomplete="one-time-code"
+                                   autofocus />
+
+                            <span asp-validation-for="Codigo"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg">
+                                Confirmar e-mail
+                            </button>
+                        </div>
+                    </form>
+
+                    <p class="text-muted small text-center mt-4 mb-0">
+                        O código é válido por 10 minutos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
