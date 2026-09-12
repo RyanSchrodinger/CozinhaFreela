@@ -2547,3 +2547,242 @@ body {
         width: 100%;
     }
 }
+/*
+    LISTA DE FUNCIONÁRIOS
+*/
+
+.funcionarios-cabecalho-acoes {
+    display: flex;
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.botao-exportar {
+    color: var(--verde-profundo);
+    background-color: transparent;
+    border-color: var(--verde-profundo);
+}
+
+    .botao-exportar:hover:not(:disabled) {
+        color: var(--branco);
+        background-color: var(--verde-profundo);
+    }
+
+    .botao-exportar:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        transform: none;
+    }
+
+.resumo-funcionarios {
+    display: grid;
+    margin-bottom: 35px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.resumo-funcionario-card {
+    position: relative;
+    min-width: 0;
+    padding: 25px 27px;
+    overflow: hidden;
+    background-color: var(--branco);
+    border: 1px solid #e4dccf;
+    box-shadow: 0 12px 32px rgba(31, 39, 29, 0.06);
+}
+
+    .resumo-funcionario-card::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 100%;
+        background-color: var(--dourado);
+        content: "";
+    }
+
+    .resumo-funcionario-card > span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--terracota);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .resumo-funcionario-card > strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--verde-profundo);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 2.25rem;
+        font-weight: 400;
+        line-height: 1;
+    }
+
+    .resumo-funcionario-card > small {
+        color: var(--texto-suave);
+        font-size: 0.77rem;
+    }
+
+.lista-funcionarios {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.funcionario-card {
+    display: flex;
+    min-width: 0;
+    padding: 29px;
+    flex-direction: column;
+    background-color: var(--branco);
+    border: 1px solid #e4dccf;
+    box-shadow: 0 15px 40px rgba(31, 39, 29, 0.07);
+}
+
+.funcionario-card-identidade {
+    display: flex;
+    min-width: 0;
+    margin-bottom: 25px;
+    gap: 16px;
+    align-items: center;
+}
+
+    .funcionario-card-identidade > div {
+        min-width: 0;
+    }
+
+.funcionario-card-avatar {
+    display: inline-flex;
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    color: var(--verde-profundo);
+    background: linear-gradient( 135deg, var(--dourado-claro), var(--dourado) );
+    border-radius: 50%;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.funcionario-card-identidade h2 {
+    margin-bottom: 5px;
+    overflow-wrap: anywhere;
+    color: var(--verde-profundo);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.funcionario-card-identidade p {
+    margin-bottom: 0;
+    color: var(--terracota);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.funcionario-card-dados {
+    display: grid;
+    margin: 0 0 27px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+    .funcionario-card-dados > div {
+        min-width: 0;
+    }
+
+    .funcionario-card-dados dt {
+        margin-bottom: 5px;
+        color: #8b857a;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .funcionario-card-dados dd {
+        margin-bottom: 0;
+        overflow-wrap: anywhere;
+        color: var(--texto);
+        font-size: 0.84rem;
+        line-height: 1.5;
+    }
+
+.funcionario-situacao {
+    display: inline-flex;
+    padding: 5px 10px;
+    align-items: center;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.situacao-ativa {
+    color: #285a39;
+    background-color: #e3f1e6;
+}
+
+.situacao-inativa {
+    color: #812f2f;
+    background-color: #f7e4e1;
+}
+
+.funcionario-card-acoes {
+    display: flex;
+    margin-top: auto;
+    padding-top: 22px;
+    gap: 11px;
+    border-top: 1px solid var(--creme-escuro);
+}
+
+    .funcionario-card-acoes .botao {
+        min-height: 46px;
+        padding: 0 18px;
+        flex: 1;
+        font-size: 0.77rem;
+    }
+
+@media (max-width: 991.98px) {
+    .lista-funcionarios {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .funcionarios-cabecalho-acoes {
+        width: 100%;
+        flex-direction: column;
+    }
+
+        .funcionarios-cabecalho-acoes .botao {
+            width: 100%;
+        }
+
+    .resumo-funcionarios {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .funcionario-card {
+        padding: 24px 20px;
+    }
+
+    .funcionario-card-dados {
+        grid-template-columns: 1fr;
+    }
+
+    .funcionario-card-acoes {
+        flex-direction: column;
+    }
+
+        .funcionario-card-acoes .botao {
+            width: 100%;
+        }
+}

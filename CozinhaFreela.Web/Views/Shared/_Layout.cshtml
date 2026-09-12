@@ -179,13 +179,11 @@
                                     @if (User.IsInRole(
                                         RolesSistema.Chefe))
                                     {
-                                        <span class="dropdown-item menu-item-indisponivel">
-                                            Painel da chefe
-
-                                            <small>
-                                                Em breve
-                                            </small>
-                                        </span>
+                                       <a class="dropdown-item"
+                                           asp-controller="Funcionarios"
+                                           asp-action="Index">
+                                            Funcionários
+                                        </a>
 
                                         <a class="dropdown-item"
                                            asp-controller="Funcionarios"

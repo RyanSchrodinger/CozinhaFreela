@@ -1,0 +1,242 @@
+﻿@model CozinhaFreela.Web.ViewModels.Funcionarios.DetalhesFuncionarioViewModel
+
+@{
+    ViewData["Title"] = "Detalhes do funcionário";
+
+    var inicial = string.IsNullOrWhiteSpace(Model.NomeCompleto)
+        ? "F"
+        : Model.NomeCompleto.Trim()[0].ToString().ToUpperInvariant();
+
+    var cpfFormatado = Model.Cpf.Length == 11
+        ? $"{Model.Cpf[..3]}.{Model.Cpf[3..6]}.{Model.Cpf[6..9]}-{Model.Cpf[9..]}"
+        : Model.Cpf;
+
+    var cepFormatado = Model.Cep.Length == 8
+        ? $"{Model.Cep[..5]}-{Model.Cep[5..]}"
+        : Model.Cep;
+
+    var textoSituacao = Model.Ativo ? "Ativo" : "Inativo";
+    var classeSituacao = Model.Ativo ? "situacao-ativa" : "situacao-inativa";
+}
+
+<section class="pagina-administrativa">
+    <div class="container">
+        <a class="voltar-administracao"
+           asp-controller="Funcionarios"
+           asp-action="Index">
+            <span aria-hidden="true">←</span>
+            Voltar para funcionários
+        </a>
+
+        <header class="analise-cabecalho">
+            <div class="analise-identificacao">
+                <span class="analise-avatar" aria-hidden="true">
+                    @inicial
+                </span>
+
+                <div>
+                    <span class="secao-etiqueta">
+                        Dados do funcionário
+                    </span>
+
+                    <h1>@Model.NomeCompleto</h1>
+
+                    <div class="analise-status">
+                        <span class="funcionario-situacao @classeSituacao">
+                            @textoSituacao
+                        </span>
+
+                        <span class="data-cadastro">
+                            Cadastrado em
+                            @Model.DataCadastro.ToString("dd/MM/yyyy")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="analise-grid">
+            <div class="analise-dados">
+                <article class="dados-card">
+                    <header class="dados-card-cabecalho">
+                        <span aria-hidden="true">01</span>
+                        <h2>Dados profissionais</h2>
+                    </header>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>Nome completo</span>
+                            <strong>@Model.NomeCompleto</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Função</span>
+                            <strong>@Model.Funcao</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>E-mail</span>
+                            <strong>@Model.Email</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Confirmação do e-mail</span>
+                            <strong>
+                                @(Model.EmailConfirmado
+                                    ? "Confirmado"
+                                    : "Não confirmado")
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Telefone</span>
+                            <strong>@Model.Telefone</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Situação</span>
+                            <strong>@textoSituacao</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <header class="dados-card-cabecalho">
+                        <span aria-hidden="true">02</span>
+                        <h2>Dados pessoais</h2>
+                    </header>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>CPF</span>
+                            <strong>@cpfFormatado</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Data de nascimento</span>
+                            <strong>
+                                @Model.DataNascimento.ToString("dd/MM/yyyy")
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Idade</span>
+                            <strong>@Model.Idade anos</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Estado civil</span>
+                            <strong>@Model.EstadoCivil</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Nacionalidade</span>
+                            <strong>@Model.Nacionalidade</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <header class="dados-card-cabecalho">
+                        <span aria-hidden="true">03</span>
+                        <h2>Endereço</h2>
+                    </header>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>CEP</span>
+                            <strong>@cepFormatado</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Rua</span>
+                            <strong>@Model.Rua</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Número</span>
+                            <strong>@Model.Numero</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Complemento</span>
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(Model.Complemento)
+                                    ? "Não informado"
+                                    : Model.Complemento)
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Bairro</span>
+                            <strong>@Model.Bairro</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Cidade e estado</span>
+                            <strong>@Model.Cidade — @Model.Estado</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <header class="dados-card-cabecalho">
+                        <span aria-hidden="true">04</span>
+                        <h2>Contato de emergência</h2>
+                    </header>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>Nome</span>
+                            <strong>@Model.ContatoEmergenciaNome</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Telefone</span>
+                            <strong>@Model.ContatoEmergenciaTelefone</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <header class="dados-card-cabecalho">
+                        <span aria-hidden="true">05</span>
+                        <h2>Observações</h2>
+                    </header>
+
+                    <p class="observacoes-funcionario">
+                        @(string.IsNullOrWhiteSpace(Model.Observacoes)
+                            ? "Nenhuma observação informada."
+                            : Model.Observacoes)
+                    </p>
+                </article>
+            </div>
+
+            <aside class="analise-acoes">
+                <div class="acoes-card">
+                    <span class="secao-etiqueta">
+                        Documentos
+                    </span>
+
+                    <h2>Exportar cadastro</h2>
+
+                    <p>
+                        Gere um documento com todas as informações
+                        deste funcionário.
+                    </p>
+
+                    <button class="botao botao-aprovar"
+                            type="button"
+                            disabled
+                            title="Disponível em breve">
+                        Exportar para PDF
+                    </button>
+
+                    <p class="decisao-aviso">
+                        A exportação será implementada na próxima etapa.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>

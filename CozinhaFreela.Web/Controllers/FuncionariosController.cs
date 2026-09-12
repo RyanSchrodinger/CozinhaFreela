@@ -18,6 +18,188 @@ namespace CozinhaFreela.Web.Controllers
         {
             _context = context;
         }
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var dados =
+                await _context.Funcionarios
+                    .AsNoTracking()
+                    .Where(
+                        funcionario =>
+                            funcionario.Usuario.StatusCadastro ==
+                            StatusCadastro.Aprovado
+                    )
+                    .OrderBy(
+                        funcionario =>
+                            funcionario.Usuario.NomeCompleto
+                    )
+                    .Select(
+                        funcionario => new
+                        {
+                            funcionario.UsuarioId,
+
+                            funcionario.Usuario.NomeCompleto,
+
+                            Email =
+                                funcionario.Usuario.Email
+                                ?? string.Empty,
+
+                            Funcao =
+                                funcionario.Funcao
+                                ?? "Não definida",
+
+                            funcionario.Telefone,
+                            funcionario.Cidade,
+                            funcionario.Estado,
+                            funcionario.Usuario.Ativo
+                        }
+                    )
+                    .ToListAsync();
+
+            var funcionarios =
+                dados.Select(
+                    funcionario =>
+                        new FuncionarioListaViewModel
+                        {
+                            UsuarioId =
+                                funcionario.UsuarioId,
+
+                            NomeCompleto =
+                                funcionario.NomeCompleto,
+
+                            Email =
+                                funcionario.Email,
+
+                            Funcao =
+                                funcionario.Funcao,
+
+                            Telefone =
+                                FormatarTelefone(
+                                    funcionario.Telefone
+                                ),
+
+                            Cidade =
+                                funcionario.Cidade,
+
+                            Estado =
+                                funcionario.Estado,
+
+                            Ativo =
+                                funcionario.Ativo
+                        }
+                )
+                .ToList();
+
+            return View(funcionarios);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Detalhes(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var funcionario =
+                await _context.Funcionarios
+                    .AsNoTracking()
+                    .Include(item => item.Usuario)
+                    .FirstOrDefaultAsync(
+                        item =>
+                            item.UsuarioId == id &&
+                            item.Usuario.StatusCadastro ==
+                            StatusCadastro.Aprovado
+                    );
+
+            if (funcionario is null)
+            {
+                return NotFound();
+            }
+
+            var model =
+                new DetalhesFuncionarioViewModel
+                {
+                    UsuarioId =
+                        funcionario.UsuarioId,
+
+                    NomeCompleto =
+                        funcionario.Usuario.NomeCompleto,
+
+                    Email =
+                        funcionario.Usuario.Email
+                        ?? string.Empty,
+
+                    EmailConfirmado =
+                        funcionario.Usuario.EmailConfirmed,
+
+                    Ativo =
+                        funcionario.Usuario.Ativo,
+
+                    Funcao =
+                        funcionario.Funcao
+                        ?? string.Empty,
+
+                    Cpf =
+                        funcionario.Cpf,
+
+                    DataNascimento =
+                        funcionario.DataNascimento,
+
+                    Idade =
+                        CalcularIdade(
+                            funcionario.DataNascimento
+                        ),
+
+                    Telefone =
+                        FormatarTelefone(
+                            funcionario.Telefone
+                        ),
+
+                    Cep =
+                        funcionario.Cep,
+
+                    Rua =
+                        funcionario.Rua,
+
+                    Numero =
+                        funcionario.Numero,
+
+                    Complemento =
+                        funcionario.Complemento,
+
+                    Bairro =
+                        funcionario.Bairro,
+
+                    Cidade =
+                        funcionario.Cidade,
+
+                    Estado =
+                        funcionario.Estado,
+
+                    Nacionalidade =
+                        funcionario.Nacionalidade,
+
+                    EstadoCivil =
+                        funcionario.EstadoCivil,
+
+                    ContatoEmergenciaNome =
+                        funcionario.ContatoEmergenciaNome,
+
+                    ContatoEmergenciaTelefone =
+                        FormatarTelefone(
+                            funcionario.ContatoEmergenciaTelefone
+                        ),
+
+                    Observacoes =
+                        funcionario.Observacoes,
+
+                    DataCadastro =
+                        funcionario.Usuario.DataCadastro
+                };
+
+            return View(model);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Pendentes()
