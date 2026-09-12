@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Acesso negado";
+}
+
+<section class="pagina-acesso-negado">
+    <div class="container">
+        <div class="acesso-negado-card">
+            <span class="acesso-negado-icone"
+                  aria-hidden="true">
+                !
+            </span>
+
+            <span class="secao-etiqueta">
+                Área restrita
+            </span>
+
+            <h1>Acesso não autorizado</h1>
+
+            <p>
+                Sua conta não possui permissão para acessar
+                esta área do sistema.
+            </p>
+
+            <a class="botao botao-verde"
+               asp-controller="Home"
+               asp-action="Index">
+                Voltar para o início
+            </a>
+        </div>
+    </div>
+</section>
