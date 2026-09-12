@@ -87,7 +87,12 @@
                         aria-controls="navegacaoPrincipal"
                         aria-expanded="false"
                         aria-label="Abrir menu de navegação">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="icone-menu"
+                          aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
                 </button>
 
                 <div id="navegacaoPrincipal"
@@ -182,13 +187,12 @@
                                             </small>
                                         </span>
 
-                                    <a
-                                        class="dropdown-item"
-                                        asp-controller="Funcionarios"
-                                        asp-action="Pendentes"
-                                    >
-                                        Cadastros pendentes
-                                    </a>
+                                        <a class="dropdown-item"
+                                           asp-controller="Funcionarios"
+                                           asp-action="Pendentes">
+                                            Cadastros pendentes
+                                        </a>
+
                                         <span class="dropdown-item menu-item-indisponivel">
                                             Escalas
 

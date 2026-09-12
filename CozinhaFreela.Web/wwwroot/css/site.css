@@ -1356,6 +1356,208 @@ img {
 }
 
 /*
+    CORRECOES GLOBAIS DE RESPONSIVIDADE
+*/
+
+body {
+    overflow-x: hidden;
+}
+
+.hero-conteudo {
+    min-width: 0;
+}
+
+.hero-titulo,
+.hero-descricao {
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+@media (max-width: 991.98px) {
+    .cabecalho .navbar > .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .cabecalho .marca {
+        max-width: calc(100% - 65px);
+    }
+
+    .cabecalho .navbar-toggler {
+        display: inline-flex !important;
+        width: 46px;
+        height: 42px;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+        color: var(--branco);
+        background-color: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 4px;
+    }
+
+    .cabecalho .navbar-toggler-icon {
+        position: relative;
+        display: block;
+        width: 24px;
+        height: 2px;
+        background-color: currentColor;
+        background-image: none;
+        border-radius: 999px;
+        filter: none;
+    }
+
+        .cabecalho .navbar-toggler-icon::before,
+        .cabecalho .navbar-toggler-icon::after {
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background-color: currentColor;
+            border-radius: 999px;
+            content: "";
+        }
+
+        .cabecalho .navbar-toggler-icon::before {
+            top: -7px;
+        }
+
+        .cabecalho .navbar-toggler-icon::after {
+            top: 7px;
+        }
+
+    .cabecalho .navbar-collapse {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+        .cabecalho .navbar-collapse:not(.show) {
+            display: none !important;
+        }
+
+        .cabecalho .navbar-collapse.show,
+        .cabecalho .navbar-collapse.collapsing {
+            display: block !important;
+        }
+
+    .cabecalho .navbar-nav {
+        width: 100%;
+        padding-top: 12px;
+        align-items: stretch !important;
+    }
+
+    .cabecalho .nav-item {
+        width: 100%;
+    }
+
+    .cabecalho .nav-link {
+        display: block;
+        width: 100%;
+        padding: 12px 5px !important;
+    }
+
+    .menu-usuario {
+        width: 100%;
+        margin: 14px 0 0;
+    }
+
+    .botao-menu-usuario,
+    .menu-usuario-dropdown {
+        width: 100%;
+    }
+
+    .menu-usuario-dropdown {
+        position: static !important;
+        margin-top: 8px !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .marca {
+        gap: 9px;
+        font-size: 1rem;
+    }
+
+    .marca-icone {
+        width: 37px;
+        height: 37px;
+        font-size: 0.72rem;
+    }
+
+    .hero-container {
+        width: 100%;
+        padding: 58px 22px 82px;
+        overflow: hidden;
+    }
+
+    .hero-conteudo {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .hero-titulo {
+        width: 100%;
+        font-size: clamp(2.25rem, 11.5vw, 3.25rem);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+    }
+
+        .hero-titulo span {
+            max-width: 100%;
+        }
+
+    .hero-descricao {
+        width: 100%;
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+
+    .hero-acoes {
+        width: 100%;
+    }
+
+        .hero-acoes .botao {
+            width: 100%;
+        }
+
+    .indicador-rolagem {
+        display: none;
+    }
+
+    .pagina-administrativa .container {
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+
+    .analise-cabecalho {
+        margin-bottom: 32px;
+    }
+
+    .analise-identificacao h1 {
+        overflow-wrap: anywhere;
+    }
+
+    .dados-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dados-card {
+        padding: 24px 20px;
+    }
+
+    .acoes-card {
+        padding: 27px 21px;
+    }
+
+    .mensagem-sistema {
+        align-items: flex-start;
+    }
+}
+
+/*
     MENU DO USUÁRIO AUTENTICADO
 */
 
@@ -2221,4 +2423,38 @@ img {
     .dados-grid {
         grid-template-columns: 1fr;
     }
+}
+@media (max-width: 991.98px) {
+    .menu-usuario {
+        display: block;
+        width: 100% !important;
+        margin: 14px 0 0 !important;
+    }
+
+    .botao-menu-usuario {
+        display: flex;
+        width: 100% !important;
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+        .botao-menu-usuario::after {
+            margin-left: auto;
+        }
+
+    .menu-usuario-dropdown {
+        position: relative !important;
+        inset: auto !important;
+        float: none !important;
+        width: 100% !important;
+        min-width: 0;
+        margin: 8px 0 0 !important;
+        transform: none !important;
+    }
+
+        .menu-usuario-dropdown[data-bs-popper] {
+            inset: auto !important;
+            margin: 8px 0 0 !important;
+            transform: none !important;
+        }
 }

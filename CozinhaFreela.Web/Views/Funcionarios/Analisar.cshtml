@@ -20,6 +20,7 @@
                 @mensagemErro
             </div>
         }
+
         <a class="voltar-administracao"
            asp-controller="Funcionarios"
            asp-action="Pendentes">
@@ -76,6 +77,7 @@
                     <div class="dados-grid">
                         <div class="dado">
                             <span>Nome completo</span>
+
                             <strong>
                                 @Model.NomeCompleto
                             </strong>
@@ -83,11 +85,15 @@
 
                         <div class="dado">
                             <span>CPF</span>
-                            <strong>@Model.Cpf</strong>
+
+                            <strong>
+                                @Model.Cpf
+                            </strong>
                         </div>
 
                         <div class="dado">
                             <span>Data de nascimento</span>
+
                             <strong>
                                 @(Model.DataNascimento.ToString(
                                     "dd/MM/yyyy"
@@ -97,6 +103,7 @@
 
                         <div class="dado">
                             <span>Idade</span>
+
                             <strong>
                                 @Model.Idade anos
                             </strong>
@@ -104,6 +111,7 @@
 
                         <div class="dado">
                             <span>Nacionalidade</span>
+
                             <strong>
                                 @Model.Nacionalidade
                             </strong>
@@ -111,6 +119,7 @@
 
                         <div class="dado">
                             <span>Estado civil</span>
+
                             <strong>
                                 @Model.EstadoCivil
                             </strong>
@@ -127,12 +136,18 @@
                     <div class="dados-grid">
                         <div class="dado">
                             <span>E-mail</span>
-                            <strong>@Model.Email</strong>
+
+                            <strong>
+                                @Model.Email
+                            </strong>
                         </div>
 
                         <div class="dado">
                             <span>Telefone</span>
-                            <strong>@Model.Telefone</strong>
+
+                            <strong>
+                                @Model.Telefone
+                            </strong>
                         </div>
                     </div>
                 </article>
@@ -146,11 +161,15 @@
                     <div class="dados-grid">
                         <div class="dado">
                             <span>CEP</span>
-                            <strong>@Model.Cep</strong>
+
+                            <strong>
+                                @Model.Cep
+                            </strong>
                         </div>
 
-                        <div class="dado dado-largo">
+                        <div class="dado">
                             <span>Logradouro</span>
+
                             <strong>
                                 @Model.Rua, @Model.Numero
                             </strong>
@@ -161,6 +180,7 @@
                         {
                             <div class="dado">
                                 <span>Complemento</span>
+
                                 <strong>
                                     @Model.Complemento
                                 </strong>
@@ -169,11 +189,15 @@
 
                         <div class="dado">
                             <span>Bairro</span>
-                            <strong>@Model.Bairro</strong>
+
+                            <strong>
+                                @Model.Bairro
+                            </strong>
                         </div>
 
                         <div class="dado">
                             <span>Cidade</span>
+
                             <strong>
                                 @Model.Cidade - @Model.Estado
                             </strong>
@@ -184,12 +208,16 @@
                 <article class="dados-card">
                     <div class="dados-card-cabecalho">
                         <span>04</span>
-                        <h2>Contato de emergência</h2>
+
+                        <h2>
+                            Contato de emergência
+                        </h2>
                     </div>
 
                     <div class="dados-grid">
                         <div class="dado">
                             <span>Nome</span>
+
                             <strong>
                                 @Model.ContatoEmergenciaNome
                             </strong>
@@ -197,6 +225,7 @@
 
                         <div class="dado">
                             <span>Telefone</span>
+
                             <strong>
                                 @Model.ContatoEmergenciaTelefone
                             </strong>
@@ -213,15 +242,15 @@
                             <h2>Observações</h2>
                         </div>
 
-                        <p class="observacoes-cadastro">
+                        <p class="observacoes-funcionario">
                             @Model.Observacoes
                         </p>
                     </article>
                 }
             </div>
 
-            <aside class="analise-decisao">
-                <div class="decisao-card">
+            <aside class="analise-acoes">
+                <div class="acoes-card">
                     <span class="secao-etiqueta">
                         Decisão
                     </span>
@@ -277,9 +306,7 @@
                     <form asp-controller="Funcionarios"
                           asp-action="Recusar"
                           method="post"
-                          onsubmit="return confirm(
-                        'Tem certeza de que deseja recusar este cadastro?'
-                        );">
+                          onsubmit="return confirm('Tem certeza de que deseja recusar este cadastro?');">
                         <input asp-for="UsuarioId"
                                type="hidden" />
 
@@ -288,12 +315,6 @@
                             Recusar cadastro
                         </button>
                     </form>
-
-                    <p class="decisao-aviso">
-                        As ações serão ativadas após
-                        implementarmos os métodos de
-                        aprovação e recusa.
-                    </p>
                 </div>
             </aside>
         </div>
