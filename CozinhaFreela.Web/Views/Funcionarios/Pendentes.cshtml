@@ -8,6 +8,23 @@ CozinhaFreela.Web.ViewModels.Funcionarios.FuncionarioPendenteViewModel
 
 <section class="pagina-administrativa">
     <div class="container">
+        @if (TempData["MensagemSucesso"] is string mensagemSucesso)
+        {
+            <div class="mensagem-sistema mensagem-sistema-sucesso"
+                 role="status">
+                <span aria-hidden="true">✓</span>
+                @mensagemSucesso
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] is string mensagemErro)
+        {
+            <div class="mensagem-sistema mensagem-sistema-erro"
+                 role="alert">
+                <span aria-hidden="true">!</span>
+                @mensagemErro
+            </div>
+        }
         <div class="administracao-cabecalho">
             <div>
                 <span class="secao-etiqueta">
@@ -171,10 +188,12 @@ CozinhaFreela.Web.ViewModels.Funcionarios.FuncionarioPendenteViewModel
                                     </td>
 
                                     <td class="tabela-acoes">
-                                        <span class="botao-analisar indisponivel"
-                                              title="A tela de análise será criada no próximo passo">
+                                        <a class="botao-analisar"
+                                           asp-controller="Funcionarios"
+                                           asp-action="Analisar"
+                                           asp-route-id="@funcionario.UsuarioId">
                                             Analisar
-                                        </span>
+                                        </a>
                                     </td>
                                 </tr>
                             }

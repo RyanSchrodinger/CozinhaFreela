@@ -1,0 +1,306 @@
+﻿@model CozinhaFreela.Web.ViewModels.Funcionarios.AnaliseFuncionarioViewModel
+
+@{
+    ViewData["Title"] = "Analisar funcionário";
+
+    var inicial =
+        Model.NomeCompleto
+            .Trim()[0]
+            .ToString()
+            .ToUpperInvariant();
+}
+
+<section class="pagina-administrativa">
+    <div class="container">
+        @if (TempData["MensagemErro"] is string mensagemErro)
+        {
+            <div class="mensagem-sistema mensagem-sistema-erro"
+                 role="alert">
+                <span aria-hidden="true">!</span>
+                @mensagemErro
+            </div>
+        }
+        <a class="voltar-administracao"
+           asp-controller="Funcionarios"
+           asp-action="Pendentes">
+            <span aria-hidden="true">←</span>
+            Voltar para cadastros pendentes
+        </a>
+
+        <div class="analise-cabecalho">
+            <div class="analise-identificacao">
+                <span class="analise-avatar">
+                    @inicial
+                </span>
+
+                <div>
+                    <span class="secao-etiqueta">
+                        Análise de cadastro
+                    </span>
+
+                    <h1>@Model.NomeCompleto</h1>
+
+                    <div class="analise-status">
+                        @if (Model.EmailConfirmado)
+                        {
+                            <span class="status-email confirmado">
+                                E-mail confirmado
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-email pendente">
+                                E-mail não confirmado
+                            </span>
+                        }
+
+                        <span class="data-cadastro">
+                            Cadastrado em
+                            @(Model.DataCadastro.ToString(
+                                "dd/MM/yyyy"
+                            ))
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analise-grid">
+            <div class="analise-dados">
+                <article class="dados-card">
+                    <div class="dados-card-cabecalho">
+                        <span>01</span>
+                        <h2>Dados pessoais</h2>
+                    </div>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>Nome completo</span>
+                            <strong>
+                                @Model.NomeCompleto
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>CPF</span>
+                            <strong>@Model.Cpf</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Data de nascimento</span>
+                            <strong>
+                                @(Model.DataNascimento.ToString(
+                                    "dd/MM/yyyy"
+                                ))
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Idade</span>
+                            <strong>
+                                @Model.Idade anos
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Nacionalidade</span>
+                            <strong>
+                                @Model.Nacionalidade
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Estado civil</span>
+                            <strong>
+                                @Model.EstadoCivil
+                            </strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <div class="dados-card-cabecalho">
+                        <span>02</span>
+                        <h2>Contato</h2>
+                    </div>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>E-mail</span>
+                            <strong>@Model.Email</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Telefone</span>
+                            <strong>@Model.Telefone</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <div class="dados-card-cabecalho">
+                        <span>03</span>
+                        <h2>Endereço</h2>
+                    </div>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>CEP</span>
+                            <strong>@Model.Cep</strong>
+                        </div>
+
+                        <div class="dado dado-largo">
+                            <span>Logradouro</span>
+                            <strong>
+                                @Model.Rua, @Model.Numero
+                            </strong>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.Complemento))
+                        {
+                            <div class="dado">
+                                <span>Complemento</span>
+                                <strong>
+                                    @Model.Complemento
+                                </strong>
+                            </div>
+                        }
+
+                        <div class="dado">
+                            <span>Bairro</span>
+                            <strong>@Model.Bairro</strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Cidade</span>
+                            <strong>
+                                @Model.Cidade - @Model.Estado
+                            </strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dados-card">
+                    <div class="dados-card-cabecalho">
+                        <span>04</span>
+                        <h2>Contato de emergência</h2>
+                    </div>
+
+                    <div class="dados-grid">
+                        <div class="dado">
+                            <span>Nome</span>
+                            <strong>
+                                @Model.ContatoEmergenciaNome
+                            </strong>
+                        </div>
+
+                        <div class="dado">
+                            <span>Telefone</span>
+                            <strong>
+                                @Model.ContatoEmergenciaTelefone
+                            </strong>
+                        </div>
+                    </div>
+                </article>
+
+                @if (!string.IsNullOrWhiteSpace(
+                    Model.Observacoes))
+                {
+                    <article class="dados-card">
+                        <div class="dados-card-cabecalho">
+                            <span>05</span>
+                            <h2>Observações</h2>
+                        </div>
+
+                        <p class="observacoes-cadastro">
+                            @Model.Observacoes
+                        </p>
+                    </article>
+                }
+            </div>
+
+            <aside class="analise-decisao">
+                <div class="decisao-card">
+                    <span class="secao-etiqueta">
+                        Decisão
+                    </span>
+
+                    <h2>Analisar acesso</h2>
+
+                    <p>
+                        Confira os dados, defina a função
+                        e escolha se o cadastro deverá ser
+                        aprovado ou recusado.
+                    </p>
+
+                    <form asp-controller="Funcionarios"
+                          asp-action="Aprovar"
+                          method="post"
+                          class="formulario-aprovacao">
+                        <input asp-for="UsuarioId"
+                               type="hidden" />
+
+                        <div class="campo-funcao">
+                            <label asp-for="Funcao"></label>
+
+                            <input asp-for="Funcao"
+                                   class="form-control"
+                                   list="funcoesDisponiveis"
+                                   placeholder="Digite ou selecione uma função"
+                                   autocomplete="off" />
+
+                            <datalist id="funcoesDisponiveis">
+                                <option value="Cozinheiro"></option>
+                                <option value="Auxiliar de cozinha"></option>
+                                <option value="Churrasqueiro"></option>
+                                <option value="Saladeiro"></option>
+                                <option value="Confeiteiro"></option>
+                                <option value="Garçom"></option>
+                                <option value="Serviços gerais"></option>
+                            </datalist>
+
+                            <span asp-validation-for="Funcao"
+                                  class="mensagem-validacao"></span>
+                        </div>
+
+                        <button type="submit"
+                                class="botao botao-aprovar">
+                            Aprovar cadastro
+                        </button>
+                    </form>
+
+                    <div class="separador-decisao">
+                        <span>ou</span>
+                    </div>
+
+                    <form asp-controller="Funcionarios"
+                          asp-action="Recusar"
+                          method="post"
+                          onsubmit="return confirm(
+                        'Tem certeza de que deseja recusar este cadastro?'
+                        );">
+                        <input asp-for="UsuarioId"
+                               type="hidden" />
+
+                        <button type="submit"
+                                class="botao botao-recusar">
+                            Recusar cadastro
+                        </button>
+                    </form>
+
+                    <p class="decisao-aviso">
+                        As ações serão ativadas após
+                        implementarmos os métodos de
+                        aprovação e recusa.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

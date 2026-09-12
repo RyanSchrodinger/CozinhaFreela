@@ -105,6 +105,237 @@ namespace CozinhaFreela.Web.Controllers
             return View(funcionarios);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Analisar(
+    string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var funcionario =
+                await _context.Funcionarios
+                    .AsNoTracking()
+                    .Include(item => item.Usuario)
+                    .FirstOrDefaultAsync(
+                        item =>
+                            item.UsuarioId == id &&
+                            item.Usuario.StatusCadastro ==
+                            StatusCadastro.Pendente
+                    );
+
+            if (funcionario is null)
+            {
+                return NotFound();
+            }
+
+            var model =
+                new AnaliseFuncionarioViewModel
+                {
+                    UsuarioId =
+                        funcionario.UsuarioId,
+
+                    NomeCompleto =
+                        funcionario.Usuario.NomeCompleto,
+
+                    Email =
+                        funcionario.Usuario.Email
+                        ?? string.Empty,
+
+                    EmailConfirmado =
+                        funcionario.Usuario.EmailConfirmed,
+
+                    Cpf =
+                        funcionario.Cpf,
+
+                    DataNascimento =
+                        funcionario.DataNascimento,
+
+                    Idade =
+                        CalcularIdade(
+                            funcionario.DataNascimento
+                        ),
+
+                    Telefone =
+                        FormatarTelefone(
+                            funcionario.Telefone
+                        ),
+
+                    Cep =
+                        funcionario.Cep,
+
+                    Rua =
+                        funcionario.Rua,
+
+                    Numero =
+                        funcionario.Numero,
+
+                    Complemento =
+                        funcionario.Complemento,
+
+                    Bairro =
+                        funcionario.Bairro,
+
+                    Cidade =
+                        funcionario.Cidade,
+
+                    Estado =
+                        funcionario.Estado,
+
+                    Nacionalidade =
+                        funcionario.Nacionalidade,
+
+                    EstadoCivil =
+                        funcionario.EstadoCivil,
+
+                    ContatoEmergenciaNome =
+                        funcionario.ContatoEmergenciaNome,
+
+                    ContatoEmergenciaTelefone =
+                        FormatarTelefone(
+                            funcionario
+                                .ContatoEmergenciaTelefone
+                        ),
+
+                    Observacoes =
+                        funcionario.Observacoes,
+
+                    DataCadastro =
+                        funcionario.Usuario.DataCadastro,
+
+                    Funcao =
+                        funcionario.Funcao
+                        ?? string.Empty
+                };
+
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Aprovar(
+    string usuarioId,
+    string? funcao)
+        {
+            funcao = funcao?.Trim();
+
+            if (string.IsNullOrWhiteSpace(usuarioId))
+            {
+                return BadRequest();
+            }
+
+            if (string.IsNullOrWhiteSpace(funcao))
+            {
+                TempData["MensagemErro"] =
+                    "Informe a função do funcionário.";
+
+                return RedirectToAction(
+                    nameof(Analisar),
+                    new
+                    {
+                        id = usuarioId
+                    }
+                );
+            }
+
+            if (funcao.Length > 80)
+            {
+                TempData["MensagemErro"] =
+                    "A função deve possuir no máximo 80 caracteres.";
+
+                return RedirectToAction(
+                    nameof(Analisar),
+                    new
+                    {
+                        id = usuarioId
+                    }
+                );
+            }
+
+            var funcionario =
+                await _context.Funcionarios
+                    .Include(item => item.Usuario)
+                    .FirstOrDefaultAsync(
+                        item =>
+                            item.UsuarioId == usuarioId &&
+                            item.Usuario.StatusCadastro ==
+                            StatusCadastro.Pendente
+                    );
+
+            if (funcionario is null)
+            {
+                TempData["MensagemErro"] =
+                    "O cadastro não foi encontrado ou já foi analisado.";
+
+                return RedirectToAction(
+                    nameof(Pendentes)
+                );
+            }
+
+            funcionario.Funcao = funcao;
+
+            funcionario.Usuario.StatusCadastro =
+                StatusCadastro.Aprovado;
+
+            funcionario.Usuario.Ativo = true;
+
+            await _context.SaveChangesAsync();
+
+            TempData["MensagemSucesso"] =
+                $"O cadastro de {funcionario.Usuario.NomeCompleto} foi aprovado.";
+
+            return RedirectToAction(
+                nameof(Pendentes)
+            );
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Recusar(
+    string usuarioId)
+        {
+            if (string.IsNullOrWhiteSpace(usuarioId))
+            {
+                return BadRequest();
+            }
+
+            var funcionario =
+                await _context.Funcionarios
+                    .Include(item => item.Usuario)
+                    .FirstOrDefaultAsync(
+                        item =>
+                            item.UsuarioId == usuarioId &&
+                            item.Usuario.StatusCadastro ==
+                            StatusCadastro.Pendente
+                    );
+
+            if (funcionario is null)
+            {
+                TempData["MensagemErro"] =
+                    "O cadastro não foi encontrado ou já foi analisado.";
+
+                return RedirectToAction(
+                    nameof(Pendentes)
+                );
+            }
+
+            funcionario.Funcao = null;
+
+            funcionario.Usuario.StatusCadastro =
+                StatusCadastro.Recusado;
+
+            funcionario.Usuario.Ativo = false;
+
+            await _context.SaveChangesAsync();
+
+            TempData["MensagemSucesso"] =
+                $"O cadastro de {funcionario.Usuario.NomeCompleto} foi recusado.";
+
+            return RedirectToAction(
+                nameof(Pendentes)
+            );
+        }
+
         private static string MascararCpf(
             string cpf)
         {
@@ -118,6 +349,25 @@ namespace CozinhaFreela.Web.Controllers
                 $"***.***.***-{cpf.Substring(9, 2)}";
         }
 
+        private static int CalcularIdade(
+    DateOnly dataNascimento)
+        {
+            var hoje =
+                DateOnly.FromDateTime(
+                    DateTime.Today
+                );
+
+            var idade =
+                hoje.Year - dataNascimento.Year;
+
+            if (dataNascimento >
+                hoje.AddYears(-idade))
+            {
+                idade--;
+            }
+
+            return idade;
+        }
         private static string FormatarTelefone(
             string telefone)
         {
