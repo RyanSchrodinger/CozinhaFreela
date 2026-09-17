@@ -29,6 +29,7 @@ html {
 body {
     min-height: 100vh;
     margin: 0;
+    overflow-x: hidden;
     color: var(--texto);
     background-color: var(--creme);
     font-family: "Segoe UI", Arial, sans-serif;
@@ -189,8 +190,7 @@ img {
     text-transform: uppercase;
 }
 
-    .secao-etiqueta::before,
-    .hero-etiqueta::before {
+    .secao-etiqueta::before {
         width: 36px;
         height: 1px;
         background-color: currentColor;
@@ -846,176 +846,6 @@ img {
     }
 
 /*
-    RESPONSIVIDADE
-*/
-
-@media (max-width: 991.98px) {
-    .cabecalho .navbar {
-        padding: 16px 0;
-    }
-
-    .cabecalho .navbar-collapse {
-        padding: 20px 0 10px;
-    }
-
-    .cabecalho .nav-link {
-        padding: 12px 0 !important;
-    }
-
-        .cabecalho .nav-link::after {
-            display: none;
-        }
-
-    .cabecalho .nav-item {
-        width: 100%;
-        margin-left: 0 !important;
-    }
-
-    .cabecalho .btn {
-        display: flex;
-        width: 100%;
-        margin-top: 8px;
-        justify-content: center;
-    }
-
-    .experiencia-grid,
-    .sabores-grid {
-        grid-template-columns: 1fr;
-        gap: 50px;
-    }
-
-    .sabores-conteudo {
-        max-width: none;
-    }
-
-    .visite-card {
-        grid-template-columns: 1fr;
-        gap: 35px;
-    }
-
-    .visite-acoes {
-        max-width: 320px;
-    }
-
-    .area-funcionario-conteudo {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .secao {
-        padding: 78px 0;
-    }
-
-    .hero-fazenda,
-    .hero-container {
-        min-height: calc(100svh - 74px);
-    }
-
-    .hero-fazenda {
-        background-position: 62% center;
-    }
-
-    .hero-sobreposicao {
-        background: linear-gradient( 90deg, rgba(10, 20, 13, 0.92), rgba(10, 20, 13, 0.55) ), linear-gradient( 0deg, rgba(10, 18, 12, 0.68), transparent );
-    }
-
-    .hero-container {
-        padding-top: 70px;
-        padding-bottom: 100px;
-    }
-
-    .hero-titulo {
-        font-size: clamp(2.8rem, 13vw, 4.3rem);
-    }
-
-    .hero-descricao {
-        font-size: 1rem;
-    }
-
-    .experiencia-grid {
-        margin-bottom: 50px;
-    }
-
-    .destaques-grid,
-    .momentos-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .destaque-card {
-        min-height: auto;
-    }
-
-    .destaque-card-escuro {
-        transform: none;
-    }
-
-    .destaque-numero {
-        margin-bottom: 35px;
-    }
-
-    .sabores-visual {
-        min-height: 430px;
-    }
-
-    .visite-card {
-        padding: 40px 30px;
-    }
-
-    .area-funcionario-acoes {
-        width: 100%;
-        flex-direction: column;
-    }
-
-        .area-funcionario-acoes .botao {
-            width: 100%;
-        }
-
-    .rodape-conteudo {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 479.98px) {
-    .hero-acoes {
-        flex-direction: column;
-    }
-
-        .hero-acoes .botao {
-            width: 100%;
-        }
-
-    .hero-etiqueta {
-        font-size: 0.66rem;
-        letter-spacing: 0.12em;
-    }
-
-    .sabores-visual {
-        min-height: 360px;
-    }
-
-    .sabores-palavra {
-        font-size: 2.7rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-/*
     PÁGINA DE LOGIN
 */
 
@@ -1296,72 +1126,9 @@ img {
         color: var(--verde-profundo);
     }
 
-@media (max-width: 991.98px) {
-    .login-card {
-        max-width: 650px;
-        grid-template-columns: 1fr;
-    }
-
-    .login-imagem {
-        min-height: 390px;
-    }
-
-    .login-apresentacao {
-        padding: 45px;
-    }
-
-    .login-formulario-area {
-        padding: 55px 45px;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .pagina-login {
-        padding: 0;
-        background-color: var(--branco);
-    }
-
-        .pagina-login .container {
-            max-width: none;
-            padding: 0;
-        }
-
-    .login-card {
-        box-shadow: none;
-    }
-
-    .login-imagem {
-        min-height: 330px;
-    }
-
-    .login-apresentacao,
-    .login-formulario-area {
-        padding: 38px 24px;
-    }
-
-        .login-apresentacao h1 {
-            font-size: 2.5rem;
-        }
-
-    .campo-login-cabecalho {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .login-cadastro {
-        align-items: center;
-        flex-direction: column;
-    }
-}
-
 /*
-    CORRECOES GLOBAIS DE RESPONSIVIDADE
+    AJUSTES GLOBAIS DE LAYOUT
 */
-
-body {
-    overflow-x: hidden;
-}
 
 .hero-conteudo {
     min-width: 0;
@@ -1371,190 +1138,6 @@ body {
 .hero-descricao {
     max-width: 100%;
     overflow-wrap: break-word;
-}
-
-@media (max-width: 991.98px) {
-    .cabecalho .navbar > .container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .cabecalho .marca {
-        max-width: calc(100% - 65px);
-    }
-
-    .cabecalho .navbar-toggler {
-        display: inline-flex !important;
-        width: 46px;
-        height: 42px;
-        padding: 0;
-        align-items: center;
-        justify-content: center;
-        color: var(--branco);
-        background-color: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.32);
-        border-radius: 4px;
-    }
-
-    .cabecalho .navbar-toggler-icon {
-        position: relative;
-        display: block;
-        width: 24px;
-        height: 2px;
-        background-color: currentColor;
-        background-image: none;
-        border-radius: 999px;
-        filter: none;
-    }
-
-        .cabecalho .navbar-toggler-icon::before,
-        .cabecalho .navbar-toggler-icon::after {
-            position: absolute;
-            left: 0;
-            width: 24px;
-            height: 2px;
-            background-color: currentColor;
-            border-radius: 999px;
-            content: "";
-        }
-
-        .cabecalho .navbar-toggler-icon::before {
-            top: -7px;
-        }
-
-        .cabecalho .navbar-toggler-icon::after {
-            top: 7px;
-        }
-
-    .cabecalho .navbar-collapse {
-        width: 100%;
-        flex-basis: 100%;
-    }
-
-        .cabecalho .navbar-collapse:not(.show) {
-            display: none !important;
-        }
-
-        .cabecalho .navbar-collapse.show,
-        .cabecalho .navbar-collapse.collapsing {
-            display: block !important;
-        }
-
-    .cabecalho .navbar-nav {
-        width: 100%;
-        padding-top: 12px;
-        align-items: stretch !important;
-    }
-
-    .cabecalho .nav-item {
-        width: 100%;
-    }
-
-    .cabecalho .nav-link {
-        display: block;
-        width: 100%;
-        padding: 12px 5px !important;
-    }
-
-    .menu-usuario {
-        width: 100%;
-        margin: 14px 0 0;
-    }
-
-    .botao-menu-usuario,
-    .menu-usuario-dropdown {
-        width: 100%;
-    }
-
-    .menu-usuario-dropdown {
-        position: static !important;
-        margin-top: 8px !important;
-        transform: none !important;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .marca {
-        gap: 9px;
-        font-size: 1rem;
-    }
-
-    .marca-icone {
-        width: 37px;
-        height: 37px;
-        font-size: 0.72rem;
-    }
-
-    .hero-container {
-        width: 100%;
-        padding: 58px 22px 82px;
-        overflow: hidden;
-    }
-
-    .hero-conteudo {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .hero-titulo {
-        width: 100%;
-        font-size: clamp(2.25rem, 11.5vw, 3.25rem);
-        line-height: 1.02;
-        letter-spacing: -0.035em;
-    }
-
-        .hero-titulo span {
-            max-width: 100%;
-        }
-
-    .hero-descricao {
-        width: 100%;
-        font-size: 0.95rem;
-        line-height: 1.65;
-    }
-
-    .hero-acoes {
-        width: 100%;
-    }
-
-        .hero-acoes .botao {
-            width: 100%;
-        }
-
-    .indicador-rolagem {
-        display: none;
-    }
-
-    .pagina-administrativa .container {
-        padding-right: 18px;
-        padding-left: 18px;
-    }
-
-    .analise-cabecalho {
-        margin-bottom: 32px;
-    }
-
-    .analise-identificacao h1 {
-        overflow-wrap: anywhere;
-    }
-
-    .dados-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dados-card {
-        padding: 24px 20px;
-    }
-
-    .acoes-card {
-        padding: 27px 21px;
-    }
-
-    .mensagem-sistema {
-        align-items: flex-start;
-    }
 }
 
 /*
@@ -1713,21 +1296,6 @@ body {
         background-color: #f9e7e4;
     }
 
-@media (max-width: 991.98px) {
-    .menu-usuario {
-        width: 100%;
-        margin: 15px 0 0;
-    }
-
-    .botao-menu-usuario {
-        width: 100%;
-    }
-
-    .menu-usuario-dropdown {
-        width: 100%;
-        margin-top: 8px !important;
-    }
-}
 /*
     PÁGINAS ADMINISTRATIVAS
 */
@@ -2027,39 +1595,6 @@ body {
 .estado-vazio p {
     margin-bottom: 27px;
     color: var(--texto-suave);
-}
-
-@media (max-width: 767.98px) {
-    .pagina-administrativa {
-        padding: 55px 0 75px;
-    }
-
-    .administracao-cabecalho {
-        align-items: stretch;
-        flex-direction: column;
-        margin-bottom: 35px;
-    }
-
-    .resumo-pendentes {
-        width: 100%;
-    }
-
-    .tabela-pendentes-cabecalho {
-        padding: 23px 20px;
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .tabela-pendentes th:first-child,
-    .tabela-pendentes td:first-child {
-        padding-left: 20px;
-    }
-
-    .tabela-pendentes th:last-child,
-    .tabela-pendentes td:last-child {
-        padding-right: 20px;
-    }
 }
 
 /*
@@ -2393,71 +1928,6 @@ body {
     text-align: center;
 }
 
-@media (max-width: 991.98px) {
-    .analise-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .analise-acoes {
-        position: static;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .analise-identificacao {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .analise-avatar {
-        width: 65px;
-        height: 65px;
-        font-size: 1.4rem;
-    }
-
-    .dados-card,
-    .acoes-card {
-        padding: 25px 21px;
-    }
-
-    .dados-grid {
-        grid-template-columns: 1fr;
-    }
-}
-@media (max-width: 991.98px) {
-    .menu-usuario {
-        display: block;
-        width: 100% !important;
-        margin: 14px 0 0 !important;
-    }
-
-    .botao-menu-usuario {
-        display: flex;
-        width: 100% !important;
-        min-width: 0;
-        justify-content: flex-start;
-    }
-
-        .botao-menu-usuario::after {
-            margin-left: auto;
-        }
-
-    .menu-usuario-dropdown {
-        position: relative !important;
-        inset: auto !important;
-        float: none !important;
-        width: 100% !important;
-        min-width: 0;
-        margin: 8px 0 0 !important;
-        transform: none !important;
-    }
-
-        .menu-usuario-dropdown[data-bs-popper] {
-            inset: auto !important;
-            margin: 8px 0 0 !important;
-            transform: none !important;
-        }
-}
 /*
     ACESSO NEGADO
 */
@@ -2518,35 +1988,6 @@ body {
     line-height: 1.7;
 }
 
-@media (max-width: 575.98px) {
-    .pagina-acesso-negado {
-        min-height: calc(100svh - 74px);
-        padding: 45px 0;
-    }
-
-        .pagina-acesso-negado .container {
-            padding-right: 18px;
-            padding-left: 18px;
-        }
-
-    .acesso-negado-card {
-        padding: 45px 24px;
-    }
-
-    .acesso-negado-icone {
-        width: 64px;
-        height: 64px;
-        font-size: 1.7rem;
-    }
-
-    .acesso-negado-card h1 {
-        font-size: 2.25rem;
-    }
-
-    .acesso-negado-card .botao {
-        width: 100%;
-    }
-}
 /*
     LISTA DE FUNCIONÁRIOS
 */
@@ -2748,44 +2189,6 @@ body {
         font-size: 0.77rem;
     }
 
-@media (max-width: 991.98px) {
-    .lista-funcionarios {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .funcionarios-cabecalho-acoes {
-        width: 100%;
-        flex-direction: column;
-    }
-
-        .funcionarios-cabecalho-acoes .botao {
-            width: 100%;
-        }
-
-    .resumo-funcionarios {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .funcionario-card {
-        padding: 24px 20px;
-    }
-
-    .funcionario-card-dados {
-        grid-template-columns: 1fr;
-    }
-
-    .funcionario-card-acoes {
-        flex-direction: column;
-    }
-
-        .funcionario-card-acoes .botao {
-            width: 100%;
-        }
-}
 /*
     BOTÃO DO MENU MOBILE
 */
@@ -2862,6 +2265,10 @@ span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
 }
 
+/*
+    RESPONSIVIDADE
+*/
+
 @media (min-width: 992px) {
     .cabecalho .navbar-toggler {
         display: none !important;
@@ -2869,7 +2276,602 @@ span:nth-child(3) {
 }
 
 @media (max-width: 991.98px) {
+    .cabecalho .navbar {
+        padding: 16px 0;
+    }
+
+    .cabecalho .navbar-collapse {
+        padding: 20px 0 10px;
+    }
+
+    .cabecalho .nav-link {
+        padding: 12px 0 !important;
+    }
+
+        .cabecalho .nav-link::after {
+            display: none;
+        }
+
+    .cabecalho .nav-item {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    .cabecalho .btn {
+        display: flex;
+        width: 100%;
+        margin-top: 8px;
+        justify-content: center;
+    }
+
+    .experiencia-grid,
+    .sabores-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .sabores-conteudo {
+        max-width: none;
+    }
+
+    .visite-card {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+    .visite-acoes {
+        max-width: 320px;
+    }
+
+    .area-funcionario-conteudo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .login-card {
+        max-width: 650px;
+        grid-template-columns: 1fr;
+    }
+
+    .login-imagem {
+        min-height: 390px;
+    }
+
+    .login-apresentacao {
+        padding: 45px;
+    }
+
+    .login-formulario-area {
+        padding: 55px 45px;
+    }
+
+    .cabecalho .navbar > .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .cabecalho .marca {
+        max-width: calc(100% - 65px);
+    }
+
     .cabecalho .navbar-toggler {
         display: inline-flex !important;
+        width: 46px;
+        height: 42px;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+        color: var(--branco);
+        background-color: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 4px;
+    }
+
+    .cabecalho .navbar-toggler-icon {
+        position: relative;
+        display: block;
+        width: 24px;
+        height: 2px;
+        background-color: currentColor;
+        background-image: none;
+        border-radius: 999px;
+        filter: none;
+    }
+
+        .cabecalho .navbar-toggler-icon::before,
+        .cabecalho .navbar-toggler-icon::after {
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background-color: currentColor;
+            border-radius: 999px;
+            content: "";
+        }
+
+        .cabecalho .navbar-toggler-icon::before {
+            top: -7px;
+        }
+
+        .cabecalho .navbar-toggler-icon::after {
+            top: 7px;
+        }
+
+    .cabecalho .navbar-collapse {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+        .cabecalho .navbar-collapse:not(.show) {
+            display: none !important;
+        }
+
+        .cabecalho .navbar-collapse.show,
+        .cabecalho .navbar-collapse.collapsing {
+            display: block !important;
+        }
+
+    .cabecalho .navbar-nav {
+        width: 100%;
+        padding-top: 12px;
+        align-items: stretch !important;
+    }
+
+    .cabecalho .nav-item {
+        width: 100%;
+    }
+
+    .cabecalho .nav-link {
+        display: block;
+        width: 100%;
+        padding: 12px 5px !important;
+    }
+
+    .menu-usuario {
+        width: 100%;
+        margin: 14px 0 0;
+    }
+
+    .botao-menu-usuario,
+    .menu-usuario-dropdown {
+        width: 100%;
+    }
+
+    .menu-usuario-dropdown {
+        position: static !important;
+        margin-top: 8px !important;
+        transform: none !important;
+    }
+
+    .menu-usuario {
+        width: 100%;
+        margin: 15px 0 0;
+    }
+
+    .botao-menu-usuario {
+        width: 100%;
+    }
+
+    .menu-usuario-dropdown {
+        width: 100%;
+        margin-top: 8px !important;
+    }
+
+    .analise-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analise-acoes {
+        position: static;
+    }
+
+    .menu-usuario {
+        display: block;
+        width: 100% !important;
+        margin: 14px 0 0 !important;
+    }
+
+    .botao-menu-usuario {
+        display: flex;
+        width: 100% !important;
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+        .botao-menu-usuario::after {
+            margin-left: auto;
+        }
+
+    .menu-usuario-dropdown {
+        position: relative !important;
+        inset: auto !important;
+        float: none !important;
+        width: 100% !important;
+        min-width: 0;
+        margin: 8px 0 0 !important;
+        transform: none !important;
+    }
+
+        .menu-usuario-dropdown[data-bs-popper] {
+            inset: auto !important;
+            margin: 8px 0 0 !important;
+            transform: none !important;
+        }
+
+    .lista-funcionarios {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho .navbar-toggler {
+        display: inline-flex !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .secao {
+        padding: 78px 0;
+    }
+
+    .hero-fazenda,
+    .hero-container {
+        min-height: calc(100svh - 74px);
+    }
+
+    .hero-fazenda {
+        background-position: 62% center;
+    }
+
+    .hero-sobreposicao {
+        background: linear-gradient( 90deg, rgba(10, 20, 13, 0.92), rgba(10, 20, 13, 0.55) ), linear-gradient( 0deg, rgba(10, 18, 12, 0.68), transparent );
+    }
+
+    .hero-container {
+        padding-top: 70px;
+        padding-bottom: 100px;
+    }
+
+    .hero-titulo {
+        font-size: clamp(2.8rem, 13vw, 4.3rem);
+    }
+
+    .hero-descricao {
+        font-size: 1rem;
+    }
+
+    .experiencia-grid {
+        margin-bottom: 50px;
+    }
+
+    .destaques-grid,
+    .momentos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .destaque-card {
+        min-height: auto;
+    }
+
+    .destaque-card-escuro {
+        transform: none;
+    }
+
+    .destaque-numero {
+        margin-bottom: 35px;
+    }
+
+    .sabores-visual {
+        min-height: 430px;
+    }
+
+    .visite-card {
+        padding: 40px 30px;
+    }
+
+    .area-funcionario-acoes {
+        width: 100%;
+        flex-direction: column;
+    }
+
+        .area-funcionario-acoes .botao {
+            width: 100%;
+        }
+
+    .rodape-conteudo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .pagina-administrativa {
+        padding: 55px 0 75px;
+    }
+
+    .administracao-cabecalho {
+        align-items: stretch;
+        flex-direction: column;
+        margin-bottom: 35px;
+    }
+
+    .resumo-pendentes {
+        width: 100%;
+    }
+
+    .tabela-pendentes-cabecalho {
+        padding: 23px 20px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .tabela-pendentes th:first-child,
+    .tabela-pendentes td:first-child {
+        padding-left: 20px;
+    }
+
+    .tabela-pendentes th:last-child,
+    .tabela-pendentes td:last-child {
+        padding-right: 20px;
+    }
+
+    .funcionarios-cabecalho-acoes {
+        width: 100%;
+        flex-direction: column;
+    }
+
+        .funcionarios-cabecalho-acoes .botao {
+            width: 100%;
+        }
+
+    .resumo-funcionarios {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* Hero */
+    .hero-fazenda {
+        min-height: auto;
+        background-position: 72% center;
+    }
+
+    .hero-container {
+        width: 100%;
+        min-height: auto;
+        padding: 72px 20px 64px;
+        overflow: hidden;
+    }
+
+    .hero-conteudo {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .hero-sobreposicao {
+        background: linear-gradient( 90deg, rgba(8, 20, 13, 0.94) 0%, rgba(8, 20, 13, 0.76) 70%, rgba(8, 20, 13, 0.55) 100% ), linear-gradient( 0deg, rgba(8, 18, 12, 0.78) 0%, transparent 55% );
+    }
+
+    .hero-etiqueta {
+        font-size: 0.62rem;
+        line-height: 1.5;
+        letter-spacing: 0.1em;
+    }
+
+    .hero-titulo {
+        width: 100%;
+        max-width: 330px;
+        margin-bottom: 24px;
+        font-size: clamp(2.55rem, 12.5vw, 3.35rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+    }
+
+        .hero-titulo span {
+            max-width: 100%;
+            line-height: 1;
+        }
+
+    .hero-descricao {
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 30px;
+        font-size: 0.92rem;
+        line-height: 1.65;
+    }
+
+    .hero-acoes {
+        width: 100%;
+        gap: 12px;
+        flex-direction: column;
+    }
+
+        .hero-acoes .botao {
+            width: 100%;
+            min-height: 50px;
+            padding: 14px 18px;
+        }
+
+    .indicador-rolagem {
+        display: none;
+    }
+
+    .pagina-login {
+        padding: 0;
+        background-color: var(--branco);
+    }
+
+        .pagina-login .container {
+            max-width: none;
+            padding: 0;
+        }
+
+    .login-card {
+        box-shadow: none;
+    }
+
+    .login-imagem {
+        min-height: 330px;
+    }
+
+    .login-apresentacao,
+    .login-formulario-area {
+        padding: 38px 24px;
+    }
+
+        .login-apresentacao h1 {
+            font-size: 2.5rem;
+        }
+
+    .campo-login-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .login-cadastro {
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .marca {
+        gap: 9px;
+        font-size: 1rem;
+    }
+
+    .marca-icone {
+        width: 37px;
+        height: 37px;
+        font-size: 0.72rem;
+    }
+
+    .pagina-administrativa .container {
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+
+    .analise-cabecalho {
+        margin-bottom: 32px;
+    }
+
+    .analise-identificacao h1 {
+        overflow-wrap: anywhere;
+    }
+
+    .dados-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dados-card {
+        padding: 24px 20px;
+    }
+
+    .acoes-card {
+        padding: 27px 21px;
+    }
+
+    .mensagem-sistema {
+        align-items: flex-start;
+    }
+
+    .analise-identificacao {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .analise-avatar {
+        width: 65px;
+        height: 65px;
+        font-size: 1.4rem;
+    }
+
+    .dados-card,
+    .acoes-card {
+        padding: 25px 21px;
+    }
+
+    .dados-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagina-acesso-negado {
+        min-height: calc(100svh - 74px);
+        padding: 45px 0;
+    }
+
+        .pagina-acesso-negado .container {
+            padding-right: 18px;
+            padding-left: 18px;
+        }
+
+    .acesso-negado-card {
+        padding: 45px 24px;
+    }
+
+    .acesso-negado-icone {
+        width: 64px;
+        height: 64px;
+        font-size: 1.7rem;
+    }
+
+    .acesso-negado-card h1 {
+        font-size: 2.25rem;
+    }
+
+    .acesso-negado-card .botao {
+        width: 100%;
+    }
+
+    .funcionario-card {
+        padding: 24px 20px;
+    }
+
+    .funcionario-card-dados {
+        grid-template-columns: 1fr;
+    }
+
+    .funcionario-card-acoes {
+        flex-direction: column;
+    }
+
+        .funcionario-card-acoes .botao {
+            width: 100%;
+        }
+}
+
+@media (max-width: 479.98px) {
+    .hero-acoes {
+        flex-direction: column;
+    }
+
+        .hero-acoes .botao {
+            width: 100%;
+        }
+
+    .hero-etiqueta {
+        font-size: 0.66rem;
+        letter-spacing: 0.12em;
+    }
+
+    .sabores-visual {
+        min-height: 360px;
+    }
+
+    .sabores-palavra {
+        font-size: 2.7rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
     }
 }

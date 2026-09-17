@@ -1,13 +1,10 @@
 using CozinhaFreela.Domain.Usuarios;
 using CozinhaFreela.Infrastructure.Data;
 using CozinhaFreela.Infrastructure.Email;
+using CozinhaFreela.Web.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
-using CozinhaFreela.Web.Services.Pdf;
-
-//pedir para o chat me passar todas regras importantes que envolve segurança 
-// tipo essa (mesmo digitando a URL diretamente, um funcionário comum não poderá acessar.)
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +21,19 @@ var connectionString =
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
     {
-        options.UseSqlServer(connectionString);
+        options.UseSqlServer(
+            connectionString,
+            sqlServerOptions =>
+            {
+                sqlServerOptions.EnableRetryOnFailure(
+                    maxRetryCount: 10,
+                    maxRetryDelay:
+                        TimeSpan.FromSeconds(10),
+                    errorNumbersToAdd:
+                        new[] { 40613 }
+                );
+            }
+        );
     }
 );
 
@@ -43,6 +52,7 @@ builder.Services
             options.Password.RequireNonAlphanumeric = false;
 
             options.Lockout.MaxFailedAccessAttempts = 5;
+
             options.Lockout.DefaultLockoutTimeSpan =
                 TimeSpan.FromMinutes(15);
         }
@@ -54,7 +64,9 @@ builder.Services.ConfigureApplicationCookie(
     options =>
     {
         options.LoginPath = "/Conta/Login";
-        options.AccessDeniedPath = "/Conta/AcessoNegado";
+
+        options.AccessDeniedPath =
+            "/Conta/AcessoNegado";
 
         options.ExpireTimeSpan =
             TimeSpan.FromHours(8);
@@ -70,18 +82,18 @@ builder.Services.Configure<ConfiguracaoEmail>(
 builder.Services.AddTransient<
     IEmailService,
     SmtpEmailService>();
+
 builder.Services.AddScoped<
     ICodigoConfirmacaoEmailService,
     CodigoConfirmacaoEmailService>();
 
 builder.Services.AddScoped<
     IRelatorioFuncionarioPdfService,
-    RelatorioFuncionarioPdfService
->();
+    RelatorioFuncionarioPdfService>();
+
 builder.Services.AddScoped<
     IRelatorioFuncionariosPdfService,
-    RelatorioFuncionariosPdfService
->();            
+    RelatorioFuncionariosPdfService>();
 
 QuestPDF.Settings.License =
     LicenseType.Community;
@@ -92,18 +104,26 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager =
         scope.ServiceProvider
-            .GetRequiredService<RoleManager<IdentityRole>>();
+            .GetRequiredService<
+                RoleManager<IdentityRole>>();
 
     var userManager =
         scope.ServiceProvider
-            .GetRequiredService<UserManager<ApplicationUser>>();
+            .GetRequiredService<
+                UserManager<ApplicationUser>>();
 
     await IdentitySeeder.SeedAsync(
         roleManager,
         userManager,
-        builder.Configuration["ChefeInicial:Nome"],
-        builder.Configuration["ChefeInicial:Email"],
-        builder.Configuration["ChefeInicial:Senha"]
+        builder.Configuration[
+            "ChefeInicial:Nome"
+        ],
+        builder.Configuration[
+            "ChefeInicial:Email"
+        ],
+        builder.Configuration[
+            "ChefeInicial:Senha"
+        ]
     );
 }
 
@@ -123,7 +143,9 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
+        pattern:
+            "{controller=Home}/{action=Index}/{id?}"
+    )
     .WithStaticAssets();
 
 app.Run();
