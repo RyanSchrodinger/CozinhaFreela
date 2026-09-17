@@ -1,5 +1,6 @@
 ﻿using CozinhaFreela.Domain.Usuarios;
 using CozinhaFreela.Infrastructure.Data;
+using CozinhaFreela.Web.Services.Pdf;
 using CozinhaFreela.Web.ViewModels.Funcionarios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,14 @@ namespace CozinhaFreela.Web.Controllers
     {
         private readonly ApplicationDbContext
             _context;
+        private readonly IRelatorioFuncionarioPdfService _relatorioFuncionarioPdfService;
 
-        public FuncionariosController(
-            ApplicationDbContext context)
+        public FuncionariosController(ApplicationDbContext context, IRelatorioFuncionarioPdfService relatorioFuncionarioPdfService)
         {
             _context = context;
+
+            _relatorioFuncionarioPdfService =
+                relatorioFuncionarioPdfService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -199,6 +203,125 @@ namespace CozinhaFreela.Web.Controllers
                 };
 
             return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ExportarPdf(
+    string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var funcionario =
+                await _context.Funcionarios
+                    .AsNoTracking()
+                    .Include(item => item.Usuario)
+                    .FirstOrDefaultAsync(
+                        item =>
+                            item.UsuarioId == id &&
+                            item.Usuario.StatusCadastro ==
+                            StatusCadastro.Aprovado
+                    );
+
+            if (funcionario is null)
+            {
+                return NotFound();
+            }
+
+            var model =
+                new DetalhesFuncionarioViewModel
+                {
+                    UsuarioId =
+                        funcionario.UsuarioId,
+
+                    NomeCompleto =
+                        funcionario.Usuario.NomeCompleto,
+
+                    Email =
+                        funcionario.Usuario.Email
+                        ?? string.Empty,
+
+                    EmailConfirmado =
+                        funcionario.Usuario.EmailConfirmed,
+
+                    Ativo =
+                        funcionario.Usuario.Ativo,
+
+                    Funcao =
+                        funcionario.Funcao
+                        ?? string.Empty,
+
+                    Cpf =
+                        funcionario.Cpf,
+
+                    DataNascimento =
+                        funcionario.DataNascimento,
+
+                    Idade =
+                        CalcularIdade(
+                            funcionario.DataNascimento
+                        ),
+
+                    Telefone =
+                        FormatarTelefone(
+                            funcionario.Telefone
+                        ),
+
+                    Cep =
+                        funcionario.Cep,
+
+                    Rua =
+                        funcionario.Rua,
+
+                    Numero =
+                        funcionario.Numero,
+
+                    Complemento =
+                        funcionario.Complemento,
+
+                    Bairro =
+                        funcionario.Bairro,
+
+                    Cidade =
+                        funcionario.Cidade,
+
+                    Estado =
+                        funcionario.Estado,
+
+                    Nacionalidade =
+                        funcionario.Nacionalidade,
+
+                    EstadoCivil =
+                        funcionario.EstadoCivil,
+
+                    ContatoEmergenciaNome =
+                        funcionario.ContatoEmergenciaNome,
+
+                    ContatoEmergenciaTelefone =
+                        FormatarTelefone(
+                            funcionario.ContatoEmergenciaTelefone
+                        ),
+
+                    Observacoes =
+                        funcionario.Observacoes,
+
+                    DataCadastro =
+                        funcionario.Usuario.DataCadastro
+                };
+
+            var arquivoPdf =
+                _relatorioFuncionarioPdfService
+                    .Gerar(model);
+
+            var nomeArquivo =
+                $"ficha-funcionario-{funcionario.UsuarioId}.pdf";
+
+            return File(
+                arquivoPdf,
+                "application/pdf",
+                nomeArquivo
+            );
         }
 
         [HttpGet]

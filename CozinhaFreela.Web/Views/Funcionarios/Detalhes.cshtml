@@ -225,15 +225,16 @@
                         deste funcionário.
                     </p>
 
-                    <button class="botao botao-aprovar"
-                            type="button"
-                            disabled
-                            title="Disponível em breve">
+                    <a class="botao botao-aprovar"
+                       asp-controller="Funcionarios"
+                       asp-action="ExportarPdf"
+                       asp-route-id="@Model.UsuarioId">
                         Exportar para PDF
-                    </button>
+                    </a>
 
                     <p class="decisao-aviso">
-                        A exportação será implementada na próxima etapa.
+                        O documento contém informações pessoais
+                        e deve ser armazenado com segurança.
                     </p>
                 </div>
             </aside>

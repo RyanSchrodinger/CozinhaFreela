@@ -3,6 +3,8 @@ using CozinhaFreela.Infrastructure.Data;
 using CozinhaFreela.Infrastructure.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
+using CozinhaFreela.Web.Services.Pdf;
 
 //pedir para o chat me passar todas regras importantes que envolve segurança 
 // tipo essa (mesmo digitando a URL diretamente, um funcionário comum não poderá acessar.)
@@ -71,6 +73,14 @@ builder.Services.AddTransient<
 builder.Services.AddScoped<
     ICodigoConfirmacaoEmailService,
     CodigoConfirmacaoEmailService>();
+
+builder.Services.AddScoped<
+    IRelatorioFuncionarioPdfService,
+    RelatorioFuncionarioPdfService
+>();
+
+QuestPDF.Settings.License =
+    LicenseType.Community;
 
 var app = builder.Build();
 
