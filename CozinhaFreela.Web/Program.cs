@@ -78,6 +78,10 @@ builder.Services.AddScoped<
     IRelatorioFuncionarioPdfService,
     RelatorioFuncionarioPdfService
 >();
+builder.Services.AddScoped<
+    IRelatorioFuncionariosPdfService,
+    RelatorioFuncionariosPdfService
+>();            
 
 QuestPDF.Settings.License =
     LicenseType.Community;

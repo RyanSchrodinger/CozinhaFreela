@@ -14,13 +14,17 @@ namespace CozinhaFreela.Web.Controllers
         private readonly ApplicationDbContext
             _context;
         private readonly IRelatorioFuncionarioPdfService _relatorioFuncionarioPdfService;
+        private readonly IRelatorioFuncionariosPdfService _relatorioFuncionariosPdfService;
 
-        public FuncionariosController(ApplicationDbContext context, IRelatorioFuncionarioPdfService relatorioFuncionarioPdfService)
+        public FuncionariosController(ApplicationDbContext context, IRelatorioFuncionarioPdfService relatorioFuncionarioPdfService, IRelatorioFuncionariosPdfService relatorioFuncionariosPdfService)
         {
             _context = context;
 
             _relatorioFuncionarioPdfService =
                 relatorioFuncionarioPdfService;
+
+            _relatorioFuncionariosPdfService =
+                relatorioFuncionariosPdfService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -316,6 +320,87 @@ namespace CozinhaFreela.Web.Controllers
 
             var nomeArquivo =
                 $"ficha-funcionario-{funcionario.UsuarioId}.pdf";
+
+            return File(
+                arquivoPdf,
+                "application/pdf",
+                nomeArquivo
+            );
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarTodosPdf()
+        {
+            var funcionarios =
+                await _context.Funcionarios
+                    .AsNoTracking()
+                    .Where(
+                        funcionario =>
+                            funcionario.Usuario.StatusCadastro ==
+                            StatusCadastro.Aprovado
+                    )
+                    .OrderBy(
+                        funcionario =>
+                            funcionario.Usuario.NomeCompleto
+                    )
+                    .Select(
+                        funcionario =>
+                            new FuncionarioRelatorioGeralViewModel
+                            {
+                                NomeCompleto =
+                                    funcionario.Usuario.NomeCompleto,
+
+                                Funcao =
+                                    funcionario.Funcao
+                                    ?? "Não definida",
+
+                                Cpf =
+                                    funcionario.Cpf,
+
+                                DataNascimento =
+                                    funcionario.DataNascimento,
+
+                                Telefone =
+                                    funcionario.Telefone,
+
+                                Cidade =
+                                    funcionario.Cidade,
+
+                                Estado =
+                                    funcionario.Estado,
+
+                                ContatoEmergenciaNome =
+                                    funcionario.ContatoEmergenciaNome,
+
+                                ContatoEmergenciaTelefone =
+                                    funcionario
+                                        .ContatoEmergenciaTelefone,
+
+                                Ativo =
+                                    funcionario.Usuario.Ativo
+                            }
+                    )
+                    .ToListAsync();
+
+            foreach (var funcionario in funcionarios)
+            {
+                funcionario.Telefone =
+                    FormatarTelefone(
+                        funcionario.Telefone
+                    );
+
+                funcionario.ContatoEmergenciaTelefone =
+                    FormatarTelefone(
+                        funcionario.ContatoEmergenciaTelefone
+                    );
+            }
+
+            var arquivoPdf =
+                _relatorioFuncionariosPdfService
+                    .Gerar(funcionarios);
+
+            var nomeArquivo =
+                $"funcionarios-{DateTime.Now:yyyy-MM-dd}.pdf";
 
             return File(
                 arquivoPdf,
