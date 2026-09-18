@@ -21,19 +21,7 @@ var connectionString =
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
     {
-        options.UseSqlServer(
-            connectionString,
-            sqlServerOptions =>
-            {
-                sqlServerOptions.EnableRetryOnFailure(
-                    maxRetryCount: 10,
-                    maxRetryDelay:
-                        TimeSpan.FromSeconds(10),
-                    errorNumbersToAdd:
-                        new[] { 40613 }
-                );
-            }
-        );
+        options.UseSqlServer(connectionString);
     }
 );
 
@@ -148,4 +136,4 @@ app.MapControllerRoute(
     )
     .WithStaticAssets();
 
-app.Run();
+app.Run();  
