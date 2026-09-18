@@ -61,6 +61,8 @@
                                 <input asp-for="Cpf"
                                        class="form-control"
                                        inputmode="numeric"
+                                       data-mask="cpf"
+                                       maxlength="14"
                                        autocomplete="off" />
 
                                 <span asp-validation-for="Cpf"
@@ -75,7 +77,12 @@
 
                                 <input asp-for="DataNascimento"
                                        class="form-control"
-                                       type="date" />
+                                       type="text"
+                                       inputmode="numeric"
+                                       data-mask="date"
+                                       maxlength="10"
+                                       placeholder="dd/mm/aaaa"
+                                       autocomplete="bday" />
 
                                 <span asp-validation-for="DataNascimento"
                                       class="text-danger">
@@ -90,6 +97,8 @@
                                 <input asp-for="Telefone"
                                        class="form-control"
                                        inputmode="tel"
+                                       data-mask="phone"
+                                       maxlength="15"
                                        autocomplete="tel" />
 
                                 <span asp-validation-for="Telefone"
@@ -155,6 +164,8 @@
                                 <input asp-for="Cep"
                                        class="form-control"
                                        inputmode="numeric"
+                                       data-mask="cep"
+                                       maxlength="9"
                                        autocomplete="postal-code" />
 
                                 <span asp-validation-for="Cep"
@@ -279,7 +290,9 @@
 
                                 <input asp-for="ContatoEmergenciaTelefone"
                                        class="form-control"
-                                       inputmode="tel" />
+                                       inputmode="tel"
+                                       data-mask="phone"
+                                       maxlength="15" />
 
                                 <span asp-validation-for="ContatoEmergenciaTelefone"
                                       class="text-danger">

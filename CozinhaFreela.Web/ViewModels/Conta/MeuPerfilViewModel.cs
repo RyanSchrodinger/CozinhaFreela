@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace CozinhaFreela.Web.ViewModels.Conta
 {
-    public class CadastroViewModel
+    public class MeuPerfilViewModel
     {
         [Required(ErrorMessage = "Informe o nome completo.")]
         [StringLength(120)]
@@ -63,8 +63,6 @@ namespace CozinhaFreela.Web.ViewModels.Conta
         [Display(Name = "Estado civil")]
         public string EstadoCivil { get; set; } = string.Empty;
 
-     
-
         [Required(ErrorMessage = "Informe o contato de emergência.")]
         [StringLength(120)]
         [Display(Name = "Nome do contato de emergência")]
@@ -78,22 +76,8 @@ namespace CozinhaFreela.Web.ViewModels.Conta
         [Display(Name = "Observações")]
         public string? Observacoes { get; set; }
 
-        [Required(ErrorMessage = "Informe uma senha.")]
-        [StringLength(
-            100,
-            MinimumLength = 8,
-            ErrorMessage = "A senha deve possuir pelo menos 8 caracteres."
-        )]
         [DataType(DataType.Password)]
-        public string Senha { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Confirme a senha.")]
-        [DataType(DataType.Password)]
-        [Compare(
-            nameof(Senha),
-            ErrorMessage = "As senhas não coincidem."
-        )]
-        [Display(Name = "Confirmar senha")]
-        public string ConfirmacaoSenha { get; set; } = string.Empty;
+        [Display(Name = "Senha atual")]
+        public string? SenhaAtual { get; set; }
     }
 }

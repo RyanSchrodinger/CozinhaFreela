@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CozinhaFreela.Web.Controllers
 {
@@ -92,6 +93,21 @@ namespace CozinhaFreela.Web.Controllers
                     model.ContatoEmergenciaTelefone
                 );
 
+            DateOnly dataNascimento;
+
+            if (!DateOnly.TryParseExact(
+                    model.DataNascimento?.Trim(),
+                    "dd/MM/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out dataNascimento))
+            {
+                ModelState.AddModelError(
+                    nameof(model.DataNascimento),
+                    "Informe a data no formato dia/mês/ano."
+                );
+            }
+
             if (model.Cpf.Length != 11)
             {
                 ModelState.AddModelError(
@@ -113,8 +129,8 @@ namespace CozinhaFreela.Web.Controllers
                     DateTime.Today
                 );
 
-            if (model.DataNascimento == default ||
-                model.DataNascimento >= hoje)
+            if (dataNascimento == default ||
+                dataNascimento >= hoje)
             {
                 ModelState.AddModelError(
                     nameof(model.DataNascimento),
@@ -211,7 +227,7 @@ namespace CozinhaFreela.Web.Controllers
                                     Cpf = model.Cpf,
 
                                     DataNascimento =
-                                        model.DataNascimento,
+                                        dataNascimento,
 
                                     Telefone =
                                         model.Telefone,
@@ -727,6 +743,245 @@ namespace CozinhaFreela.Web.Controllers
         }
 
         /*
+            MEU PERFIL
+        */
+
+        [Authorize(Roles = RolesSistema.Funcionario)]
+        [HttpGet]
+        public async Task<IActionResult> MeuPerfil()
+        {
+            var usuario = await _userManager.GetUserAsync(User);
+
+            if (usuario is null)
+            {
+                return Challenge();
+            }
+
+            var funcionario = await _context.Funcionarios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.UsuarioId == usuario.Id);
+
+            if (funcionario is null)
+            {
+                return NotFound();
+            }
+
+            var model = new MeuPerfilViewModel
+            {
+                NomeCompleto = usuario.NomeCompleto,
+                Email = usuario.Email ?? string.Empty,
+                Cpf = FormatarCpf(funcionario.Cpf),
+                DataNascimento = funcionario.DataNascimento
+                    .ToString("dd/MM/yyyy"),
+                Telefone = FormatarTelefone(funcionario.Telefone),
+                Cep = FormatarCep(funcionario.Cep),
+                Rua = funcionario.Rua,
+                Numero = funcionario.Numero,
+                Complemento = funcionario.Complemento,
+                Bairro = funcionario.Bairro,
+                Cidade = funcionario.Cidade,
+                Estado = funcionario.Estado,
+                Nacionalidade = funcionario.Nacionalidade,
+                EstadoCivil = funcionario.EstadoCivil,
+                ContatoEmergenciaNome =
+                    funcionario.ContatoEmergenciaNome,
+                ContatoEmergenciaTelefone = FormatarTelefone(
+                    funcionario.ContatoEmergenciaTelefone),
+                Observacoes = funcionario.Observacoes
+            };
+
+            return View(model);
+        }
+
+        [Authorize(Roles = RolesSistema.Funcionario)]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MeuPerfil(
+            MeuPerfilViewModel model)
+        {
+            var usuario = await _userManager.GetUserAsync(User);
+
+            if (usuario is null)
+            {
+                return Challenge();
+            }
+
+            var funcionario = await _context.Funcionarios
+                .FirstOrDefaultAsync(item =>
+                    item.UsuarioId == usuario.Id);
+
+            if (funcionario is null)
+            {
+                return NotFound();
+            }
+
+            model.Cpf = SomenteNumeros(model.Cpf);
+            model.Telefone = SomenteNumeros(model.Telefone);
+            model.Cep = SomenteNumeros(model.Cep);
+            model.ContatoEmergenciaTelefone = SomenteNumeros(
+                model.ContatoEmergenciaTelefone);
+
+            if (model.Cpf.Length != 11)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Cpf),
+                    "O CPF deve possuir 11 números.");
+            }
+
+            if (model.Cep.Length != 8)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Cep),
+                    "O CEP deve possuir 8 números.");
+            }
+
+            if (!DateOnly.TryParseExact(
+                    model.DataNascimento?.Trim(),
+                    "dd/MM/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var dataNascimento) ||
+                dataNascimento >= DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(
+                    nameof(model.DataNascimento),
+                    "Informe uma data de nascimento válida no formato dia/mês/ano.");
+            }
+
+            var cpfEmUso = await _context.Funcionarios
+                .AsNoTracking()
+                .AnyAsync(item =>
+                    item.Cpf == model.Cpf &&
+                    item.UsuarioId != usuario.Id);
+
+            if (cpfEmUso)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Cpf),
+                    "Este CPF já pertence a outro cadastro.");
+            }
+
+            var novoEmail = (model.Email ?? string.Empty).Trim();
+            var emailAlterado = !string.Equals(
+                usuario.Email,
+                novoEmail,
+                StringComparison.OrdinalIgnoreCase);
+            var cpfAlterado = funcionario.Cpf != model.Cpf;
+
+            if ((emailAlterado || cpfAlterado) &&
+                string.IsNullOrWhiteSpace(model.SenhaAtual))
+            {
+                ModelState.AddModelError(
+                    nameof(model.SenhaAtual),
+                    "Informe sua senha para alterar o CPF ou o e-mail.");
+            }
+            else if ((emailAlterado || cpfAlterado) &&
+                !await _userManager.CheckPasswordAsync(
+                    usuario,
+                    model.SenhaAtual!))
+            {
+                ModelState.AddModelError(
+                    nameof(model.SenhaAtual),
+                    "A senha informada está incorreta.");
+            }
+
+            if (emailAlterado)
+            {
+                var usuarioDoEmail =
+                    await _userManager.FindByEmailAsync(novoEmail);
+
+                if (usuarioDoEmail is not null &&
+                    usuarioDoEmail.Id != usuario.Id)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.Email),
+                        "Este e-mail já está sendo utilizado.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            usuario.NomeCompleto = model.NomeCompleto.Trim();
+            funcionario.Cpf = model.Cpf;
+            funcionario.DataNascimento = dataNascimento;
+            funcionario.Telefone = model.Telefone;
+            funcionario.Cep = model.Cep;
+            funcionario.Rua = model.Rua.Trim();
+            funcionario.Numero = model.Numero.Trim();
+            funcionario.Complemento = model.Complemento?.Trim();
+            funcionario.Bairro = model.Bairro.Trim();
+            funcionario.Cidade = model.Cidade.Trim();
+            funcionario.Estado = model.Estado.Trim().ToUpperInvariant();
+            funcionario.Nacionalidade = model.Nacionalidade.Trim();
+            funcionario.EstadoCivil = model.EstadoCivil.Trim();
+            funcionario.ContatoEmergenciaNome =
+                model.ContatoEmergenciaNome.Trim();
+            funcionario.ContatoEmergenciaTelefone =
+                model.ContatoEmergenciaTelefone;
+            funcionario.Observacoes = model.Observacoes?.Trim();
+
+            if (emailAlterado)
+            {
+                usuario.Email = novoEmail;
+                usuario.UserName = novoEmail;
+                usuario.EmailConfirmed = false;
+                usuario.DataExpiracaoConfirmacao =
+                    DateTime.UtcNow.AddHours(24);
+            }
+
+            var resultadoUsuario =
+                await _userManager.UpdateAsync(usuario);
+
+            if (!resultadoUsuario.Succeeded)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Não foi possível atualizar o perfil.");
+
+                return View(model);
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (emailAlterado)
+            {
+                await _signInManager.SignOutAsync();
+
+                try
+                {
+                    await _codigoConfirmacaoEmailService
+                        .GerarEEnviarAsync(usuario);
+
+                    TempData["SucessoConfirmacao"] =
+                        "E-mail alterado. Enviamos um novo código de confirmação.";
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(
+                        exception,
+                        "Não foi possível enviar o código após a alteração do e-mail do usuário {UsuarioId}.",
+                        usuario.Id);
+
+                    TempData["ErroConfirmacao"] =
+                        "O e-mail foi alterado, mas o código não pôde ser enviado. Use a opção de reenviar código.";
+                }
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id });
+            }
+
+            TempData["PerfilAtualizado"] =
+                "Suas informações foram atualizadas.";
+
+            return RedirectToAction(nameof(MeuPerfil));
+        }
+
+        /*
             LOGIN
         */
 
@@ -974,6 +1229,36 @@ namespace CozinhaFreela.Web.Controllers
                     : nome[..2];
 
             return $"{inicio}***@{partes[1]}";
+        }
+
+        private static string FormatarCpf(string cpf)
+        {
+            var numeros = SomenteNumeros(cpf);
+
+            return numeros.Length == 11
+                ? $"{numeros[..3]}.{numeros.Substring(3, 3)}.{numeros.Substring(6, 3)}-{numeros[9..]}"
+                : cpf;
+        }
+
+        private static string FormatarTelefone(string telefone)
+        {
+            var numeros = SomenteNumeros(telefone);
+
+            return numeros.Length switch
+            {
+                11 => $"({numeros[..2]}) {numeros.Substring(2, 5)}-{numeros[7..]}",
+                10 => $"({numeros[..2]}) {numeros.Substring(2, 4)}-{numeros[6..]}",
+                _ => telefone
+            };
+        }
+
+        private static string FormatarCep(string cep)
+        {
+            var numeros = SomenteNumeros(cep);
+
+            return numeros.Length == 8
+                ? $"{numeros[..5]}-{numeros[5..]}"
+                : cep;
         }
     }
 }

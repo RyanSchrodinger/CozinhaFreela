@@ -228,13 +228,15 @@
 
                                     <div class="dropdown-divider"></div>
 
-                                    <span class="dropdown-item menu-item-indisponivel">
-                                        Meu perfil
-
-                                        <small>
-                                            Em breve
-                                        </small>
-                                    </span>
+                                    @if (User.IsInRole(
+                                        CozinhaFreela.Domain.Usuarios.RolesSistema.Funcionario))
+                                    {
+                                        <a class="dropdown-item"
+                                           asp-controller="Conta"
+                                           asp-action="MeuPerfil">
+                                            Meu perfil
+                                        </a>
+                                    }
 
                                     <form asp-controller="Conta"
                                           asp-action="Logout"
