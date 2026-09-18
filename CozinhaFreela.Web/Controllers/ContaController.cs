@@ -68,7 +68,7 @@ namespace CozinhaFreela.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cadastro(
-            CadastroViewModel model)
+     CadastroViewModel model)
         {
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -122,6 +122,11 @@ namespace CozinhaFreela.Web.Controllers
                 );
             }
 
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
             var cpfExistente =
                 await _context.Funcionarios
                     .AsNoTracking()
@@ -136,134 +141,210 @@ namespace CozinhaFreela.Web.Controllers
                     nameof(model.Cpf),
                     "Já existe um cadastro com este CPF."
                 );
-            }
 
-            if (!ModelState.IsValid)
-            {
                 return View(model);
             }
 
-            await using var transacao =
-                await _context.Database
-                    .BeginTransactionAsync();
+            var estrategia =
+                _context.Database
+                    .CreateExecutionStrategy();
 
-            var usuario = new ApplicationUser
+            (
+                IdentityResult Resultado,
+                ApplicationUser? Usuario
+            ) resultadoTransacao;
+
+            try
             {
-                NomeCompleto =
-                    model.NomeCompleto.Trim(),
+                resultadoTransacao =
+                    await estrategia.ExecuteAsync(
+                        async () =>
+                        {
+                            await using var transacao =
+                                await _context.Database
+                                    .BeginTransactionAsync();
 
-                UserName =
-                    model.Email.Trim(),
+                            var usuario =
+                                new ApplicationUser
+                                {
+                                    NomeCompleto =
+                                        model.NomeCompleto.Trim(),
 
-                Email =
-                    model.Email.Trim(),
+                                    UserName =
+                                        model.Email.Trim(),
 
-                EmailConfirmed = false,
+                                    Email =
+                                        model.Email.Trim(),
 
-                StatusCadastro =
-                    StatusCadastro.Pendente,
+                                    EmailConfirmed = false,
 
-                Ativo = false
-            };
+                                    StatusCadastro =
+                                        StatusCadastro.Pendente,
 
-            var resultadoUsuario =
-                await _userManager.CreateAsync(
-                    usuario,
-                    model.Senha
+                                    Ativo = false
+                                };
+
+                            var resultadoUsuario =
+                                await _userManager.CreateAsync(
+                                    usuario,
+                                    model.Senha
+                                );
+
+                            if (!resultadoUsuario.Succeeded)
+                            {
+                                return (
+                                    Resultado:
+                                        resultadoUsuario,
+
+                                    Usuario:
+                                        (ApplicationUser?)null
+                                );
+                            }
+
+                            var funcionario =
+                                new Funcionario
+                                {
+                                    UsuarioId = usuario.Id,
+                                    Cpf = model.Cpf,
+
+                                    DataNascimento =
+                                        model.DataNascimento,
+
+                                    Telefone =
+                                        model.Telefone,
+
+                                    Cep = model.Cep,
+
+                                    Rua =
+                                        model.Rua.Trim(),
+
+                                    Numero =
+                                        model.Numero.Trim(),
+
+                                    Complemento =
+                                        model.Complemento?.Trim(),
+
+                                    Bairro =
+                                        model.Bairro.Trim(),
+
+                                    Cidade =
+                                        model.Cidade.Trim(),
+
+                                    Estado =
+                                        model.Estado
+                                            .Trim()
+                                            .ToUpperInvariant(),
+
+                                    Nacionalidade =
+                                        model.Nacionalidade.Trim(),
+
+                                    EstadoCivil =
+                                        model.EstadoCivil.Trim(),
+
+                                    Funcao = null,
+
+                                    ContatoEmergenciaNome =
+                                        model
+                                            .ContatoEmergenciaNome
+                                            .Trim(),
+
+                                    ContatoEmergenciaTelefone =
+                                        model
+                                            .ContatoEmergenciaTelefone,
+
+                                    Observacoes =
+                                        model.Observacoes?.Trim()
+                                };
+
+                            _context.Funcionarios.Add(
+                                funcionario
+                            );
+
+                            await _context.SaveChangesAsync();
+
+                            var resultadoRole =
+                                await _userManager.AddToRoleAsync(
+                                    usuario,
+                                    RolesSistema.Funcionario
+                                );
+
+                            if (!resultadoRole.Succeeded)
+                            {
+                                return (
+                                    Resultado:
+                                        resultadoRole,
+
+                                    Usuario:
+                                        (ApplicationUser?)null
+                                );
+                            }
+
+                            await transacao.CommitAsync();
+
+                            return (
+                                Resultado:
+                                    IdentityResult.Success,
+
+                                Usuario:
+                                    (ApplicationUser?)usuario
+                            );
+                        }
+                    );
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(
+                    exception,
+                    "Ocorreu um erro durante o cadastro de um funcionário."
                 );
 
-            if (!resultadoUsuario.Succeeded)
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Não foi possível concluir o cadastro agora. Aguarde alguns instantes e tente novamente."
+                );
+
+                return View(model);
+            }
+
+            if (!resultadoTransacao.Resultado.Succeeded)
             {
                 AdicionarErros(
-                    resultadoUsuario
+                    resultadoTransacao.Resultado
                 );
 
                 return View(model);
             }
 
-            var funcionario = new Funcionario
+            var usuarioCriado =
+                resultadoTransacao.Usuario;
+
+            if (usuarioCriado is null)
             {
-                UsuarioId = usuario.Id,
-                Cpf = model.Cpf,
-
-                DataNascimento =
-                    model.DataNascimento,
-
-                Telefone = model.Telefone,
-                Cep = model.Cep,
-
-                Rua =
-                    model.Rua.Trim(),
-
-                Numero =
-                    model.Numero.Trim(),
-
-                Complemento =
-                    model.Complemento?.Trim(),
-
-                Bairro =
-                    model.Bairro.Trim(),
-
-                Cidade =
-                    model.Cidade.Trim(),
-
-                Estado =
-                    model.Estado
-                        .Trim()
-                        .ToUpperInvariant(),
-
-                Nacionalidade =
-                    model.Nacionalidade.Trim(),
-
-                EstadoCivil =
-                    model.EstadoCivil.Trim(),
-
-                Funcao = null,
-
-                ContatoEmergenciaNome =
-                    model.ContatoEmergenciaNome.Trim(),
-
-                ContatoEmergenciaTelefone =
-                    model.ContatoEmergenciaTelefone,
-
-                Observacoes =
-                    model.Observacoes?.Trim()
-            };
-
-            _context.Funcionarios.Add(
-                funcionario
-            );
-
-            await _context.SaveChangesAsync();
-
-            var resultadoRole =
-                await _userManager.AddToRoleAsync(
-                    usuario,
-                    RolesSistema.Funcionario
+                _logger.LogError(
+                    "O cadastro foi concluído sem retornar o usuário criado."
                 );
 
-            if (!resultadoRole.Succeeded)
-            {
-                AdicionarErros(
-                    resultadoRole
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Não foi possível concluir o cadastro."
                 );
 
                 return View(model);
             }
-
-            await transacao.CommitAsync();
 
             try
             {
                 await _codigoConfirmacaoEmailService
-                    .GerarEEnviarAsync(usuario);
+                    .GerarEEnviarAsync(
+                        usuarioCriado
+                    );
             }
             catch (Exception exception)
             {
                 _logger.LogError(
                     exception,
                     "Não foi possível enviar o código de confirmação para o usuário {UsuarioId}.",
-                    usuario.Id
+                    usuarioCriado.Id
                 );
 
                 TempData["AvisoEnvioEmail"] =
@@ -278,7 +359,8 @@ namespace CozinhaFreela.Web.Controllers
                 nameof(ConfirmarEmail),
                 new
                 {
-                    usuarioId = usuario.Id
+                    usuarioId =
+                        usuarioCriado.Id
                 }
             );
         }
