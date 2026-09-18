@@ -100,30 +100,33 @@ QuestPDF.Settings.License =
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager =
-        scope.ServiceProvider
-            .GetRequiredService<
-                RoleManager<IdentityRole>>();
+var loggerInicializacao = app.Services
+    .GetRequiredService<ILoggerFactory>()
+    .CreateLogger("Inicializacao");
 
-    var userManager =
-        scope.ServiceProvider
-            .GetRequiredService<
-                UserManager<ApplicationUser>>();
+try
+{
+    using var scope = app.Services.CreateScope();
+
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
+
+    var userManager = scope.ServiceProvider
+        .GetRequiredService<UserManager<ApplicationUser>>();
 
     await IdentitySeeder.SeedAsync(
         roleManager,
         userManager,
-        builder.Configuration[
-            "ChefeInicial:Nome"
-        ],
-        builder.Configuration[
-            "ChefeInicial:Email"
-        ],
-        builder.Configuration[
-            "ChefeInicial:Senha"
-        ]
+        builder.Configuration["ChefeInicial:Nome"],
+        builder.Configuration["ChefeInicial:Email"],
+        builder.Configuration["ChefeInicial:Senha"]
+    );
+}
+catch (Exception exception)
+{
+    loggerInicializacao.LogError(
+        exception,
+        "Não foi possível executar o IdentitySeeder durante a inicialização."
     );
 }
 
