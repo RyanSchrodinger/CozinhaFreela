@@ -175,6 +175,7 @@ namespace CozinhaFreela.Infrastructure.Email
 
             registro.DataConfirmacao = DateTime.UtcNow;
             registro.Usuario.EmailConfirmed = true;
+            registro.Usuario.DataExpiracaoConfirmacao = null;
 
             await _context.SaveChangesAsync();
 

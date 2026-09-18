@@ -9,6 +9,20 @@
         <div class="col-md-7 col-lg-5">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4 p-md-5">
+                    @if (TempData["SucessoConfirmacao"] is string sucesso)
+                    {
+                        <div class="alert alert-success" role="status">
+                            @sucesso
+                        </div>
+                    }
+
+                    @if (TempData["ErroConfirmacao"] is string erro)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @erro
+                        </div>
+                    }
+
                     <div class="text-center mb-4">
                         <h1 class="h3">
                             Confirme seu e-mail
@@ -59,8 +73,117 @@
                     <p class="text-muted small text-center mt-4 mb-0">
                         O código é válido por 10 minutos.
                     </p>
+
+                    <p class="text-muted small text-center mt-2">
+                        O cadastro será apagado se o e-mail não for
+                        confirmado em até 24 horas.
+                    </p>
+
+                    <hr class="my-4" />
+
+                    <div class="d-grid gap-2">
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalReenviarCodigo">
+                            Reenviar código
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalAlterarEmail">
+                            Corrigir meu e-mail
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalCancelarCadastro">
+                            Cancelar cadastro
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalReenviarCodigo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="ReenviarCodigo" method="post">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Reenviar código</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="UsuarioId" value="@Model.UsuarioId" type="hidden" />
+                    <label for="senhaReenvio" class="form-label">Confirme sua senha</label>
+                    <input id="senhaReenvio" name="Senha" type="password" class="form-control" required autocomplete="current-password" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
+                    <button type="submit" class="btn btn-primary">Enviar novo código</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAlterarEmail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="AlterarEmailPendente" method="post">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Corrigir e-mail</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="UsuarioId" value="@Model.UsuarioId" type="hidden" />
+                    <div class="mb-3">
+                        <label for="novoEmail" class="form-label">Novo e-mail</label>
+                        <input id="novoEmail" name="NovoEmail" type="email" class="form-control" required autocomplete="email" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmacaoNovoEmail" class="form-label">Confirme o novo e-mail</label>
+                        <input id="confirmacaoNovoEmail" name="ConfirmacaoNovoEmail" type="email" class="form-control" required autocomplete="email" />
+                    </div>
+                    <div>
+                        <label for="senhaAlteracao" class="form-label">Sua senha</label>
+                        <input id="senhaAlteracao" name="Senha" type="password" class="form-control" required autocomplete="current-password" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
+                    <button type="submit" class="btn btn-primary">Alterar e enviar código</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCancelarCadastro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="CancelarCadastro" method="post">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Cancelar cadastro</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="UsuarioId" value="@Model.UsuarioId" type="hidden" />
+                    <div class="alert alert-danger">
+                        Esta ação excluirá permanentemente todos os dados do cadastro.
+                    </div>
+                    <label for="senhaCancelamento" class="form-label">Confirme sua senha</label>
+                    <input id="senhaCancelamento" name="Senha" type="password" class="form-control" required autocomplete="current-password" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Manter cadastro</button>
+                    <button type="submit" class="btn btn-danger">Excluir meu cadastro</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

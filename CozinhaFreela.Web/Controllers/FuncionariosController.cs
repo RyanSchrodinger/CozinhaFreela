@@ -5,6 +5,8 @@ using CozinhaFreela.Web.ViewModels.Funcionarios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using CozinhaFreela.Infrastructure.Email;
 
 namespace CozinhaFreela.Web.Controllers
 {
@@ -15,8 +17,15 @@ namespace CozinhaFreela.Web.Controllers
             _context;
         private readonly IRelatorioFuncionarioPdfService _relatorioFuncionarioPdfService;
         private readonly IRelatorioFuncionariosPdfService _relatorioFuncionariosPdfService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICodigoConfirmacaoEmailService _codigoConfirmacaoEmailService;
 
-        public FuncionariosController(ApplicationDbContext context, IRelatorioFuncionarioPdfService relatorioFuncionarioPdfService, IRelatorioFuncionariosPdfService relatorioFuncionariosPdfService)
+        public FuncionariosController(
+            ApplicationDbContext context,
+            IRelatorioFuncionarioPdfService relatorioFuncionarioPdfService,
+            IRelatorioFuncionariosPdfService relatorioFuncionariosPdfService,
+            UserManager<ApplicationUser> userManager,
+            ICodigoConfirmacaoEmailService codigoConfirmacaoEmailService)
         {
             _context = context;
 
@@ -25,6 +34,10 @@ namespace CozinhaFreela.Web.Controllers
 
             _relatorioFuncionariosPdfService =
                 relatorioFuncionariosPdfService;
+
+            _userManager = userManager;
+            _codigoConfirmacaoEmailService =
+                codigoConfirmacaoEmailService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -662,6 +675,17 @@ namespace CozinhaFreela.Web.Controllers
                 );
             }
 
+            if (!funcionario.Usuario.EmailConfirmed)
+            {
+                TempData["MensagemErro"] =
+                    "O e-mail precisa ser confirmado antes da aprovação.";
+
+                return RedirectToAction(
+                    nameof(Analisar),
+                    new { id = usuarioId }
+                );
+            }
+
             funcionario.Funcao = funcao;
 
             funcionario.Usuario.StatusCadastro =
@@ -724,6 +748,124 @@ namespace CozinhaFreela.Web.Controllers
             return RedirectToAction(
                 nameof(Pendentes)
             );
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReenviarCodigo(
+            string usuarioId)
+        {
+            var usuario = await _userManager.FindByIdAsync(usuarioId);
+
+            if (usuario is null || usuario.EmailConfirmed)
+            {
+                TempData["MensagemErro"] =
+                    "O cadastro não foi encontrado ou o e-mail já foi confirmado.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            await _codigoConfirmacaoEmailService.GerarEEnviarAsync(
+                usuario
+            );
+
+            TempData["MensagemSucesso"] =
+                $"Um novo código foi enviado para {usuario.Email}.";
+
+            return RedirectToAction(nameof(Pendentes));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CorrigirEmail(
+            string usuarioId,
+            string novoEmail)
+        {
+            var usuario = await _userManager.FindByIdAsync(usuarioId);
+
+            if (usuario is null || usuario.EmailConfirmed)
+            {
+                TempData["MensagemErro"] =
+                    "Somente cadastros sem confirmação podem ter o e-mail corrigido aqui.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            novoEmail = novoEmail?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(novoEmail) ||
+                !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
+                    .IsValid(novoEmail))
+            {
+                TempData["MensagemErro"] =
+                    "Informe um e-mail válido.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            var usuarioDoEmail =
+                await _userManager.FindByEmailAsync(novoEmail);
+
+            if (usuarioDoEmail is not null &&
+                usuarioDoEmail.Id != usuario.Id)
+            {
+                TempData["MensagemErro"] =
+                    "Este e-mail já está sendo utilizado.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            usuario.Email = novoEmail;
+            usuario.UserName = novoEmail;
+            usuario.EmailConfirmed = false;
+            usuario.DataExpiracaoConfirmacao =
+                DateTime.UtcNow.AddHours(24);
+
+            var resultado = await _userManager.UpdateAsync(usuario);
+
+            if (!resultado.Succeeded)
+            {
+                TempData["MensagemErro"] =
+                    "Não foi possível corrigir o e-mail.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            await _codigoConfirmacaoEmailService.GerarEEnviarAsync(
+                usuario
+            );
+
+            TempData["MensagemSucesso"] =
+                "E-mail corrigido e novo código enviado.";
+
+            return RedirectToAction(nameof(Pendentes));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirNaoConfirmado(
+            string usuarioId)
+        {
+            var usuario = await _userManager.FindByIdAsync(usuarioId);
+
+            if (usuario is null || usuario.EmailConfirmed)
+            {
+                TempData["MensagemErro"] =
+                    "Somente cadastros sem e-mail confirmado podem ser excluídos por esta ação.";
+
+                return RedirectToAction(nameof(Pendentes));
+            }
+
+            var nome = usuario.NomeCompleto;
+            var resultado = await _userManager.DeleteAsync(usuario);
+
+            TempData[resultado.Succeeded
+                ? "MensagemSucesso"
+                : "MensagemErro"] = resultado.Succeeded
+                    ? $"O cadastro de {nome} foi excluído."
+                    : "Não foi possível excluir o cadastro.";
+
+            return RedirectToAction(nameof(Pendentes));
         }
 
         private static string MascararCpf(

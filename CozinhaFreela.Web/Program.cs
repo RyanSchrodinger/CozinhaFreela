@@ -2,6 +2,7 @@ using CozinhaFreela.Domain.Usuarios;
 using CozinhaFreela.Infrastructure.Data;
 using CozinhaFreela.Infrastructure.Email;
 using CozinhaFreela.Web.Services.Pdf;
+using CozinhaFreela.Web.Services.Cadastro;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
@@ -95,6 +96,9 @@ builder.Services.AddScoped<
     IRelatorioFuncionariosPdfService,
     RelatorioFuncionariosPdfService>();
 
+builder.Services.AddHostedService<
+    CadastroPendenteCleanupService>();
+
 QuestPDF.Settings.License =
     LicenseType.Community;
 
@@ -151,4 +155,4 @@ app.MapControllerRoute(
     )
     .WithStaticAssets();
 
-app.Run();  
+app.Run();

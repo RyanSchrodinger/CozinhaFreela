@@ -16,7 +16,15 @@
                 </p>
             </div>
 
-            <form asp-controller="Conta"
+            @if (TempData["CadastroExpirado"] is string cadastroExpirado)
+            {
+                <div class="alert alert-warning" role="alert">
+                    @cadastroExpirado
+                </div>
+            }
+
+            <form id="formCadastro"
+                  asp-controller="Conta"
                   asp-action="Cadastro"
                   method="post">
 
@@ -350,7 +358,8 @@
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit"
+                    <button type="button"
+                            id="botaoRevisarCadastro"
                             class="btn btn-primary btn-lg">
                         Enviar cadastro
                     </button>
@@ -360,11 +369,115 @@
     </div>
 </div>
 
+<div class="modal fade"
+     id="modalConfirmarCadastro"
+     tabindex="-1"
+     aria-labelledby="tituloModalConfirmarCadastro"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5"
+                    id="tituloModalConfirmarCadastro">
+                    Antes de enviar seu cadastro
+                </h2>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fechar">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Enviaremos um código de confirmação para:
+                </p>
+
+                <p class="fw-bold text-break"
+                   id="emailRevisaoCadastro">
+                </p>
+
+                <p>
+                    Confira se o endereço está correto e se você
+                    consegue acessar esse e-mail.
+                </p>
+
+                <p class="mb-2">Depois do envio, você poderá:</p>
+
+                <ul>
+                    <li>pedir um novo código;</li>
+                    <li>corrigir o e-mail informado;</li>
+                    <li>cancelar e apagar o cadastro.</li>
+                </ul>
+
+                <div class="alert alert-warning mb-0">
+                    Para sua segurança, essas opções pedem a senha.
+                    O cadastro será apagado se o e-mail não for
+                    confirmado em até 24 horas.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Voltar e corrigir
+                </button>
+
+                <button type="button"
+                        id="botaoConfirmarEnvioCadastro"
+                        class="btn btn-primary">
+                    Confirmar e enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const formCadastro =
+                document.getElementById("formCadastro");
+
+            const botaoRevisarCadastro =
+                document.getElementById("botaoRevisarCadastro");
+
+            const botaoConfirmarEnvioCadastro =
+                document.getElementById("botaoConfirmarEnvioCadastro");
+
+            const campoEmail =
+                document.getElementById("Email");
+
+            const emailRevisaoCadastro =
+                document.getElementById("emailRevisaoCadastro");
+
+            const elementoModal =
+                document.getElementById("modalConfirmarCadastro");
+
+            botaoRevisarCadastro?.addEventListener("click", () => {
+                if (!formCadastro.checkValidity()) {
+                    formCadastro.reportValidity();
+                    return;
+                }
+
+                emailRevisaoCadastro.textContent =
+                    campoEmail.value.trim();
+
+                bootstrap.Modal
+                    .getOrCreateInstance(elementoModal)
+                    .show();
+            });
+
+            botaoConfirmarEnvioCadastro?.addEventListener("click", () => {
+                botaoConfirmarEnvioCadastro.disabled = true;
+                botaoConfirmarEnvioCadastro.textContent = "Enviando...";
+                formCadastro.submit();
+            });
+
             const campoCep =
                 document.getElementById("Cep");
 

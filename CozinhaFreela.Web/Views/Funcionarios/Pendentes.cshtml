@@ -194,6 +194,48 @@ CozinhaFreela.Web.ViewModels.Funcionarios.FuncionarioPendenteViewModel
                                            asp-route-id="@funcionario.UsuarioId">
                                             Analisar
                                         </a>
+
+                                        @if (!funcionario.EmailConfirmado)
+                                        {
+                                            <div class="dropdown mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                        type="button"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                    Opções do e-mail
+                                                </button>
+
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <form asp-action="ReenviarCodigo" method="post">
+                                                            <input type="hidden" name="usuarioId" value="@funcionario.UsuarioId" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                Reenviar código
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                    <li>
+                                                        <button type="button"
+                                                                class="dropdown-item"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#corrigirEmail-@funcionario.UsuarioId">
+                                                            Corrigir e-mail
+                                                        </button>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider" /></li>
+                                                    <li>
+                                                        <form asp-action="ExcluirNaoConfirmado"
+                                                              method="post"
+                                                              onsubmit="return confirm('Excluir permanentemente este cadastro?');">
+                                                            <input type="hidden" name="usuarioId" value="@funcionario.UsuarioId" />
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                Excluir cadastro
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -201,6 +243,45 @@ CozinhaFreela.Web.ViewModels.Funcionarios.FuncionarioPendenteViewModel
                     </table>
                 </div>
             </div>
+
+            @foreach (var funcionario in Model.Where(item => !item.EmailConfirmado))
+            {
+                <div class="modal fade"
+                     id="corrigirEmail-@funcionario.UsuarioId"
+                     tabindex="-1"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form asp-action="CorrigirEmail" method="post">
+                                <div class="modal-header">
+                                    <h2 class="modal-title fs-5">Corrigir e-mail</h2>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted">
+                                        @funcionario.NomeCompleto
+                                    </p>
+                                    <input type="hidden" name="usuarioId" value="@funcionario.UsuarioId" />
+                                    <label class="form-label" for="email-@funcionario.UsuarioId">Novo e-mail</label>
+                                    <input id="email-@funcionario.UsuarioId"
+                                           type="email"
+                                           name="novoEmail"
+                                           value="@funcionario.Email"
+                                           class="form-control"
+                                           required />
+                                    <div class="form-text">
+                                        Um novo código será enviado e o prazo de 24 horas começará novamente.
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Salvar e enviar código</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
         }
     </div>
 </section>

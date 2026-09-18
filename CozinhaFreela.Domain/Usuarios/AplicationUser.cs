@@ -12,6 +12,9 @@ namespace CozinhaFreela.Domain.Usuarios
         public DateTime DataCadastro { get; set; }
             = DateTime.UtcNow;
 
+        public DateTime? DataExpiracaoConfirmacao { get; set; }
+            = DateTime.UtcNow.AddHours(24);
+
         public StatusCadastro StatusCadastro { get; set; }
             = StatusCadastro.Pendente;
 

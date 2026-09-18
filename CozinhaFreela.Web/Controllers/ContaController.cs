@@ -178,6 +178,9 @@ namespace CozinhaFreela.Web.Controllers
 
                                     EmailConfirmed = false,
 
+                                    DataExpiracaoConfirmacao =
+                                        DateTime.UtcNow.AddHours(24),
+
                                     StatusCadastro =
                                         StatusCadastro.Pendente,
 
@@ -396,6 +399,18 @@ namespace CozinhaFreela.Web.Controllers
                 );
             }
 
+            if (!usuario.EmailConfirmed &&
+                usuario.DataExpiracaoConfirmacao.HasValue &&
+                usuario.DataExpiracaoConfirmacao <= DateTime.UtcNow)
+            {
+                await _userManager.DeleteAsync(usuario);
+
+                TempData["CadastroExpirado"] =
+                    "O prazo de 24 horas terminou. Faça um novo cadastro para continuar.";
+
+                return RedirectToAction(nameof(Cadastro));
+            }
+
             if (usuario.EmailConfirmed)
             {
                 return RedirectToAction(
@@ -526,6 +541,191 @@ namespace CozinhaFreela.Web.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReenviarCodigo(
+            ReenviarCodigoViewModel model)
+        {
+            var usuario = await _userManager.FindByIdAsync(
+                model.UsuarioId
+            );
+
+            if (usuario is null || usuario.EmailConfirmed)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!await _userManager.CheckPasswordAsync(
+                    usuario,
+                    model.Senha))
+            {
+                TempData["ErroConfirmacao"] =
+                    "A senha informada está incorreta.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            var ultimoEnvio = await _context.CodigosConfirmacaoEmail
+                .Where(codigo => codigo.UsuarioId == usuario.Id)
+                .OrderByDescending(codigo => codigo.DataCriacao)
+                .Select(codigo => (DateTime?)codigo.DataCriacao)
+                .FirstOrDefaultAsync();
+
+            if (ultimoEnvio.HasValue &&
+                ultimoEnvio.Value.AddMinutes(1) > DateTime.UtcNow)
+            {
+                TempData["ErroConfirmacao"] =
+                    "Aguarde um minuto antes de solicitar outro código.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            await _codigoConfirmacaoEmailService.GerarEEnviarAsync(
+                usuario
+            );
+
+            TempData["SucessoConfirmacao"] =
+                "Um novo código foi enviado para seu e-mail.";
+
+            return RedirectToAction(
+                nameof(ConfirmarEmail),
+                new { usuarioId = usuario.Id }
+            );
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AlterarEmailPendente(
+            AlterarEmailPendenteViewModel model)
+        {
+            var usuario = await _userManager.FindByIdAsync(
+                model.UsuarioId
+            );
+
+            if (usuario is null || usuario.EmailConfirmed)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!ModelState.IsValid ||
+                !await _userManager.CheckPasswordAsync(
+                    usuario,
+                    model.Senha))
+            {
+                TempData["ErroConfirmacao"] =
+                    "Confira os dados e informe a senha correta.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            var novoEmail = model.NovoEmail.Trim();
+
+            var usuarioDoEmail =
+                await _userManager.FindByEmailAsync(novoEmail);
+
+            if (usuarioDoEmail is not null &&
+                usuarioDoEmail.Id != usuario.Id)
+            {
+                TempData["ErroConfirmacao"] =
+                    "Este e-mail já está sendo utilizado.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            usuario.Email = novoEmail;
+            usuario.UserName = novoEmail;
+            usuario.EmailConfirmed = false;
+            usuario.DataExpiracaoConfirmacao =
+                DateTime.UtcNow.AddHours(24);
+
+            var resultado = await _userManager.UpdateAsync(usuario);
+
+            if (!resultado.Succeeded)
+            {
+                TempData["ErroConfirmacao"] =
+                    "Não foi possível alterar o e-mail.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            await _codigoConfirmacaoEmailService.GerarEEnviarAsync(
+                usuario
+            );
+
+            TempData["SucessoConfirmacao"] =
+                "E-mail alterado. Enviamos um novo código.";
+
+            return RedirectToAction(
+                nameof(ConfirmarEmail),
+                new { usuarioId = usuario.Id }
+            );
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarCadastro(
+            CancelarCadastroViewModel model)
+        {
+            var usuario = await _userManager.FindByIdAsync(
+                model.UsuarioId
+            );
+
+            if (usuario is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (usuario.EmailConfirmed ||
+                !await _userManager.CheckPasswordAsync(
+                    usuario,
+                    model.Senha))
+            {
+                TempData["ErroConfirmacao"] =
+                    "Não foi possível cancelar. Verifique sua senha.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            var resultado = await _userManager.DeleteAsync(usuario);
+
+            if (!resultado.Succeeded)
+            {
+                TempData["ErroConfirmacao"] =
+                    "Não foi possível cancelar o cadastro.";
+
+                return RedirectToAction(
+                    nameof(ConfirmarEmail),
+                    new { usuarioId = usuario.Id }
+                );
+            }
+
+            TempData["CadastroCancelado"] =
+                "Seu cadastro foi cancelado e os dados foram excluídos.";
+
+            return RedirectToAction("Index", "Home");
+        }
+
         /*
             LOGIN
         */
@@ -611,9 +811,19 @@ namespace CozinhaFreela.Web.Controllers
             {
                 if (!usuario.EmailConfirmed)
                 {
+                    if (await _userManager.CheckPasswordAsync(
+                            usuario,
+                            model.Senha))
+                    {
+                        return RedirectToAction(
+                            nameof(ConfirmarEmail),
+                            new { usuarioId = usuario.Id }
+                        );
+                    }
+
                     ModelState.AddModelError(
                         string.Empty,
-                        "Você precisa confirmar seu e-mail antes de entrar."
+                        "E-mail ou senha inválidos."
                     );
                 }
                 else

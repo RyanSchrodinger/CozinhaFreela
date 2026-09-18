@@ -2,6 +2,15 @@
     ViewData["Title"] = "Sabores, música e natureza";
 }
 
+@if (TempData["CadastroCancelado"] is string cadastroCancelado)
+{
+    <div class="container pt-3">
+        <div class="alert alert-success mb-0" role="status">
+            @cadastroCancelado
+        </div>
+    </div>
+}
+
 <section id="inicio" class="hero-fazenda">
     <div class="hero-sobreposicao"></div>
 
